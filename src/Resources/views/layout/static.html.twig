@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Symfony Starter{% endblock %}</title>
+
+        <meta charset="UTF-8">
+        <meta name="description" content="Clean and responsive administration panel">
+        <meta name="keywords" content="Admin,Panel,HTML,CSS,XML,JavaScript">
+        <meta name="author" content="Erik Campobadal">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'uikit/css/uikit.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'css/component.css') }}" />
+        {% block stylesheets %}{% endblock %}
+		<script src="{{ asset(quick_coding.public ~ 'js/jquery.min.js') }}"></script>
+		<script src="{{ asset(quick_coding.public ~ 'uikit/js/uikit.min.js') }}"></script>
+		<script src="{{ asset(quick_coding.public ~ 'uikit/js/uikit-icons.min.js') }}"></script>
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+		<script src="{{ asset(quick_coding.public ~ 'js/jquery.transit.min.js') }}"></script>
+		{% block javascripts %}{% endblock %}
+    </body>
+</html>
+

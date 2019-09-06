@@ -1,0 +1,239 @@
+{# =========================================================== Form Start and End ===========================================================#}
+{%- block form_start -%}
+    {%- if not form.vars.disabled -%}
+    	{%- set blocks = [] -%}
+    	{%- for item in form -%}{%- set blocks = blocks|merge([item.vars.block_prefixes[(item.vars.block_prefixes|length) - 2]]) -%}{%- endfor -%}
+        
+        {%if 'choice' in blocks %}
+        	<link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/selectize/css/selectize.css') }}" />
+        	<!--[if IE 8]><script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/es5.js') }}"></script><![endif]-->
+        	<script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/jquery-ui_sortable.min.js') }}"></script>
+    	    <script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/standalone/selectize.min.js') }}"></script>
+    	{% endif %}
+    	
+    	{%if 'datepicker' in blocks or 'timepicker' in blocks or 'datetimepicker' in blocks %}
+        	<link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/flatpickr/flatpickr.min.css') }}" />
+        	<!--[if IE 9]><link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/flatpickr/ie.css') }}" /><![endif]-->
+        	<script src="{{ asset(quick_coding.public ~ 'plugins/flatpickr/flatpickr.min.js') }}"></script>
+    	{% endif %}
+    	
+    	{%if 'texteditor' in blocks %}
+        	<script src="{{ asset(quick_coding.public ~ 'plugins/tinymce/tinymce.min.js') }}"></script>
+    	{% endif %}
+    	
+    	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-form-horizontal')|trim }) -%}
+        {%- do form.setMethodRendered() -%}
+        {% set method = method|upper %}
+        {%- if method in ["GET", "POST"] -%}
+            {% set form_method = method %}
+        {%- else -%}
+            {% set form_method = "POST" %}
+        {%- endif -%}
+	{%- endif -%}
+    	<div class="uk-card uk-card-default uk-border-rounded">
+        	<div class="uk-card-header uk-border-rounded">
+        		<h3><b>{{ item.id ? (not form.vars.disabled ? 'Edit ' : '') ~ config.title : 'New ' ~ config.title|default('Form Data') }}</b></h3>
+        	</div>
+        	<div class="uk-card-body">
+	{%- if not form.vars.disabled -%}
+                <form{% if name != '' %} name="form_{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+                {%- if form_method != method -%}
+                    <input type="hidden" name="_method" value="{{ method }}" />
+                {%- endif -%}
+	{%- else -%}
+				<form class="uk-form-horizontal">
+	{%- endif -%}
+	
+{%- endblock form_start -%}
+
+{%- block form_end -%}
+            {%- if not render_rest is defined or render_rest -%}
+                {{ form_rest(form) }}
+            {%- endif -%}
+        	<div class="uk-custom-footer uk-border-rounded">
+        	{%- if not form.vars.disabled -%}
+                {%- if config.submit is not defined or (config.submit is defined and config.submit) -%}
+                    <button type="submit" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
+                    	<span uk-icon="icon: check" class="uk-margin-small-right"></span> {{ config.submit.text|default('Save') }}
+                    </button>
+                {%- endif -%}
+			{%- else -%}
+				<a href="{{ config.edit.url }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
+                    <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> {{ config.edit.text|default('Edit') }}
+				</a> 
+            {%- endif -%}
+            {%- if config.cancel is not defined or (config.cancel is defined and config.cancel) -%}
+                <a href="{{ config.cancel.url|default('javascript:history.back()') }}" class="uk-button uk-button-danger uk-button-small uk-border-rounded">
+                    <span uk-icon="icon: close" class="uk-margin-small-right"></span> 
+            		{%- if not form.vars.disabled -%}        
+                        {{ config.cancel.text|default('Cancel') }}
+					{%- else -%}
+						{{ config.cancel.text|default('Close') }}
+					{%- endif -%} 
+				</a> 
+            {%- endif -%}
+            </div>
+            </form>
+        </div>
+    </div>
+    
+    {%- if not form.vars.disabled -%}
+        {%- set blocks = [] -%}
+    	{%- for item in form -%}{%- set blocks = blocks|merge([item.vars.block_prefixes[(item.vars.block_prefixes|length) - 2]]) -%}{%- endfor -%}
+        
+        {%if 'choice' in blocks %}
+    	    <script>$('select').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
+    	{% endif %}
+    	
+    	{%if 'datepicker' in blocks %}
+    	    <script>$(".flatpickr-datepicker").flatpickr();</script>
+    	{% endif %}	
+    	
+    	{%if 'timepicker' in blocks %}
+    	    <script>$(".flatpickr-timepicker").flatpickr({enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr:true});</script>
+    	{% endif %}
+    	
+    	{%if 'datetimepicker' in blocks %}
+    	    <script>$(".flatpickr-datetimepicker").flatpickr({enableTime: true, time_24hr:true});</script>
+    	{% endif %}
+    	
+    	{%if 'texteditor' in blocks %}
+    	    <script>
+    	    tinymce.init({
+    		    selector: '.tinymce-texteditor', menubar: false, plugins : 'lists', height: 400,
+    		    toolbar: ['formatselect | bold italic underline strikethrough | subscript superscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent'],
+    	    })
+    	    </script>
+    	{% endif %}
+	{%- endif -%}
+	
+{%- endblock form_end -%}
+
+{# =========================================================== Form Rows ===========================================================#}
+{%- block form_row -%}
+    {%- set widget_attr = {} -%}
+    <div class="uk-margin">
+        {{ form_label(form) }}
+        <div class="uk-form-controls">
+            {{- form_widget(form, widget_attr) -}}
+            {%- if help is not empty -%}
+            <span class="uk-text-small uk-text-muted uk-display-block">{{ help }}</span>
+            {%- endif -%}
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+{%- endblock form_row -%}
+
+{# =========================================================== Form Errors ===========================================================#}
+{% block form_errors -%}
+    {%- if errors|length > 0 -%}
+    	{%- for error in errors -%}
+            <span class="uk-text-small uk-text-danger uk-display-block">
+                {{ error.message }}
+        	</span>
+        {%- endfor -%}
+    {%- endif %}
+{%- endblock form_errors %}
+
+{# =========================================================== Form Label ===========================================================#}
+{%- block form_label -%}
+	{%- set label_attr = label_attr|merge({ 'class': (label_attr.class|default('') ~ ' uk-form-label')|trim }) -%}
+    {% if label is not same as(false) -%}
+        {% if not compound -%}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {%- endif -%}
+        {% if required -%}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        {% if label is empty -%}
+            {%- if label_format is not empty -%}
+                {% set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) %}
+            {%- else -%}
+                {% set label = name|humanize %}
+            {%- endif -%}
+        {%- endif -%}
+        <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
+            {%- if translation_domain is same as(false) -%}
+                {{- label -}}
+            {%- else -%}
+                {{- label|trans({}, translation_domain) -}}
+            {%- endif -%}
+        </{{ element|default('label') }}>
+    {%- endif -%}
+{%- endblock form_label -%}
+
+{# =========================================================== Form Widget Simple ===========================================================#}
+{%- block form_widget_simple -%}
+	{%- if not form.parent.vars.disabled -%}
+    	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-input')|trim }) -%}
+        {%- set type = type|default('text') -%}
+        {%- if type == 'range' or type == 'color' -%}
+            {%- set required = false -%}
+        {%- endif -%}
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {%- else -%}
+    	{%- if form.vars.name != "_token" -%}
+    		<p class="uk-input">{{ value }}</p>
+    	{%- endif -%}
+    {%- endif -%}
+{%- endblock form_widget_simple -%}
+
+{# =========================================================== Widget Textarea ===========================================================#}
+{%- block textarea_widget -%}
+    {%- if not form.parent.vars.disabled -%}
+    	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-textarea')|trim }) -%}
+        <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+	{%- else -%}
+    	<p class="uk-input">{{ value }}</p>
+    {%- endif -%}
+{%- endblock textarea_widget -%}
+
+{# =========================================================== Form Widget Compound ===========================================================#}
+{%- block form_widget_compound -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- if form is rootform -%}
+            {{ form_errors(form) }}
+        {%- endif -%}
+        {{- block('form_rows') -}}
+        {{- form_rest(form) -}}
+    </div>
+{%- endblock form_widget_compound -%}
+
+{# =========================================================== Widget Choice ===========================================================#}
+{%- block choice_widget -%}
+    {% if expanded %}
+        {{- block('choice_widget_expanded') -}}
+    {% else %}
+        {{- block('choice_widget_collapsed') -}}
+    {% endif %}
+{%- endblock choice_widget -%}
+
+{%- block choice_widget_collapsed -%}
+	{%- if not form.parent.vars.disabled -%}
+    	{%- if placeholder is none -%}
+            {% set placeholder = 'Select ' ~ form.vars.name %}
+        {%- endif -%}
+        {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+            {% set required = false %}
+        {%- endif -%}
+        <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+            {%- if placeholder is not none -%}
+                <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+            {%- endif -%}
+            {%- if preferred_choices|length > 0 -%}
+                {% set options = preferred_choices %}
+                {{- block('choice_widget_options') -}}
+                {%- if choices|length > 0 and separator is not none -%}
+                    <option disabled="disabled">{{ separator }}</option>
+                {%- endif -%}
+            {%- endif -%}
+            {%- set options = choices -%}
+            {{- block('choice_widget_options') -}}
+        </select>
+	{%- else -%}
+    	<p class="uk-input">{%- for choice in choices -%}{%- if choice.value == value -%}{{ choice.label }}{%- endif -%}{%- endfor -%}</p>
+    {%- endif -%}
+{%- endblock choice_widget_collapsed -%}

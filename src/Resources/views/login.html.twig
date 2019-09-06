@@ -1,0 +1,97 @@
+{% extends '__layout/static.html.twig' %}
+
+{% block title %}Log in{% endblock %}
+
+{% block body %}
+<div class="content-background">
+    <div class="uk-section-large">
+        <div class="uk-container uk-container-large">
+            <div uk-grid>
+                <div class="uk-width-1-6@s uk-width-1-5@m uk-width-1-4@l uk-width-1-3@xl"></div>
+                <div class="uk-width-2-3@s uk-width-3-5@m uk-width-1-2@l uk-width-1-3@xl">
+                    <div class="uk-card uk-card-default">
+                        <div class="uk-card-header">
+                            Login Page
+                        </div>
+                        <div class="uk-card-body">
+                            <center>
+                                <h2>Symfony Starter</h2><br />
+                            </center>
+                            <form method="post">
+                            
+                            	{% if error %}
+                                    <div class="uk-alert-danger" uk-alert>
+                                        <a class="uk-alert-close" uk-close></a>
+                                        <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+                                    </div>
+                                {% endif %}
+                            
+                                {% if app.user %}
+                                	<div class="success" uk-alert>
+                                        <a class="uk-alert-close" uk-close></a>
+                                        <p>You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</p>
+                                    </div>
+                                {% endif %}
+    
+                                <fieldset class="uk-fieldset">
+
+                                    <div class="uk-margin">
+                                    	<div class="uk-position-relative">
+                                    		<span class="uk-form-icon" uk-icon="icon: user"></span>
+                                            <input type="email" value="{{ last_username }}" name="Email" id="inputEmail" class="uk-input" placeholder=" Email" required autofocus>
+                                        </div>
+                                    </div>
+
+                                    <div class="uk-margin">
+                                        <div class="uk-position-relative">
+                                            <span class="uk-form-icon" uk-icon="icon: lock"></span>
+                                            <input type="password" name="Password" id="inputPassword" class="uk-input" placeholder="Password" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                    {#
+                                    Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                                    See https://symfony.com/doc/current/security/remember_me.html
+                            
+                                    <div class="checkbox mb-3">
+                                        <label>
+                                            <input type="checkbox" name="_remember_me"> Remember me
+                                        </label>
+                                    </div>
+
+                                    <div class="uk-margin">
+                                        <a href="#">Forgot your password?</a>
+                                    </div>
+									#}
+                                    <div class="uk-margin">
+                                        <button type="submit" class="uk-button uk-button-primary">
+                                            <span class="ion-forward"></span>Login
+                                        </button>
+                                    </div>
+
+                                    <hr />
+                                    
+									{#
+                                    <center>
+                                        <p>
+                                            You don't have an account yet?
+                                        </p>
+                                        <a href="register.html" class="uk-button uk-button-default">
+                                            <span class="ion-android-person-add"></span>&nbsp; Register
+                                        </a>
+                                    </center>
+                                    #}
+                                    
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+               <div class="uk-width-1-6@s uk-width-1-5@m uk-width-1-4@l uk-width-1-3@xl"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
