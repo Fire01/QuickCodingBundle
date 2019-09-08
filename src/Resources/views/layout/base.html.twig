@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{% block title %}Symfony Starter{% endblock %}</title>
+        <title>{% block title %}{{ quick_coding.app_name }}{% endblock %}</title>
 
         <meta charset="UTF-8">
         <meta name="description" content="Clean and responsive administration panel">
@@ -22,8 +22,8 @@
                 <nav uk-navbar>
                     <div class="uk-navbar-left">
                         <a id="sidebar_toggle" class="uk-navbar-toggle" uk-navbar-toggle-icon ></a>
-                        <a href="#" class="uk-navbar-item uk-logo">
-                            UI Admin
+                        <a href="/" class="uk-navbar-item uk-logo">
+                            {{ quick_coding.app_name }}
                         </a>
                     </div>
                     <div class="uk-navbar-right uk-light">
