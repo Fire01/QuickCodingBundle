@@ -2,8 +2,11 @@
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 	
     <services>
-    	<service id="quick_coding.page_generator" class="Fire01\QuickCodingBundle\Services\PageGenerator" autowire="true" autoconfigure="true" public="false"/>
-    	<service id="Fire01\QuickCodingBundle\Services\PageGenerator" alias="quick_coding.page_generator" />
+    	<service id="Fire01\QuickCodingBundle\Services\PageGenerator" autowire="true" autoconfigure="true" public="false"/>
+    	
+		<service id="Fire01\QuickCodingBundle\Command\MakeController" autoconfigure="true">
+		    <argument type="service" id="maker.doctrine_helper" />
+		</service>
     </services>
     
 </container>

@@ -11,16 +11,21 @@ class PageGenerator extends AbstractController {
         $action = strtolower($request->attributes->get('_route_params')['action']);
         $id = $request->attributes->get('id');
         
-        if($action && $id){
-            if($id){
-                if($action == 'remove'){
-                    return $this->remove($configuration['entity'], $id);
-                }else{
-                    return $this->generateForm($configuration['title'], $configuration['entity'], $configuration['form'], $request->attributes->get('id'), $action == 'get' ? false : true);
-                }
-            }
+        switch($action){
+            case 'create':
+                return $this->generateForm($configuration['title'], $configuration['entity'], $configuration['form']);
+                break;
+            case 'read':
+                return $this->generateForm($configuration['title'], $configuration['entity'], $configuration['form'], $id, false);
+                break;
+            case 'update':
+                return $this->generateForm($configuration['title'], $configuration['entity'], $configuration['form'], $id, true);
+                break;
+            case 'delete':
+                return $this->remove($configuration['entity'], $id);
+                break;
         }
-                
+        
         return $this->generateView($configuration['title'], $configuration['entity'], $configuration['view']);
     }
    
