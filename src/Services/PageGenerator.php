@@ -1,71 +1,38 @@
 <?php  
 namespace Fire01\QuickCodingBundle\Services;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\ORM\EntityManagerInterface;
-use Twig\Environment;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class PageGenerator{ 
+class PageGenerator extends AbstractController { 
     
-    private $request;
-    private $router;
-    private $repository;
-    private $EM;
-    private $twig;
-    
-    private $name;
-    private $title;
-    private $url = [];
-    
-    public function __construct(RouterInterface $router, RequestStack $request, EntityManagerInterface $entityManager, Environment $twig)
-    {
-        $this->request = $request;
-        $this->router = $router;
-        $this->EM = $entityManager;
-        $this->twig = $twig;
-    }
-    
-    function load($config){
-        $this->name = $config['name'];
-        $this->title = isset($config['title']) && $config['title'] ? $config['title'] : ucfirst($this->name);
-        $this->repository = $config['repository'];
+    function generate($configuration){
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $action = strtolower($request->attributes->get('_route_params')['action']);
+        $id = $request->attributes->get('id');
         
-        $controller = explode("::", $this->request->getCurrentRequest()->attributes->get('_controller'))[0];
-        foreach($this->router->getRouteCollection()->all() as $route){
-            $ctrl = explode("::", $route->getDefaults()['_controller']);
-            if($controller == $ctrl[0]){
-                 switch($ctrl[1]){
-                     case "view":
-                         $this->url['view'] = $route->getPath();
-                         break;
-                     case "form":
-                         $urlForm = str_replace("{id}", "", $route->getPath());
-                         $this->url['new'] = str_replace("{action}/", "new", $urlForm);
-                         $this->url['open'] = str_replace("{action}", "get", $urlForm) . "{id}";
-                         $this->url['edit'] = str_replace("{action}", "edit", $urlForm) . "{id}";
-                         $this->url['remove'] = str_replace("{action}", "remove", $urlForm) . "{id}";
-                         break;
-                 }
+        if($action && $id){
+            if($id){
+                if($action == 'remove'){
+                    return $this->remove($configuration['entity'], $id);
+                }else{
+                    return $this->generateForm($configuration['title'], $configuration['entity'], $configuration['form'], $request->attributes->get('id'), $action == 'get' ? false : true);
+                }
             }
         }
+                
+        return $this->generateView($configuration['title'], $configuration['entity'], $configuration['view']);
     }
-    
-    function generateView($column, Response $response=null){
-        $params = $this->request->getCurrentRequest()->query->all();
-        $config = [
-            "title" => $this->title,
-            "url"   => $this->url,
-            "column" => $column
-        ];
+   
+    function generateView($title, $entityID, $view){
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $path = $this->generateUrl($request->attributes->get('_route'), []);
+        $query = $request->query->all();
         
-        if(isset($params['type']) && $params['type'] == 'json'){
-            $dataTables = $this->dataTable($config["column"], $params["order"], $params["length"], $params["start"], $params["search"]["value"]); 
-            return new JsonResponse([
-                "draw"  => $params["draw"],
+        if(isset($query['type']) && $query['type'] == 'json'){
+            $dataTables = $this->dataTable($entityID, $view, $query["order"], $query["length"], $query["start"], $query["search"]["value"]); 
+            return $this->json([
+                "draw"  => $query["draw"],
                 "recordsTotal"  => $dataTables["total"],
                 "recordsFiltered"  => $dataTables["total"],
                 "data"  => $dataTables["data"],
@@ -73,47 +40,47 @@ class PageGenerator{
             ], JsonResponse::HTTP_OK);
         }
         
-        return new Response($this->twig->render("@quick_coding.view/component/view.html.twig", $config));
+        return $this->render('@quick_coding.view/component/view.html.twig', ["title" => $title, "column" => $view, "path" => $path]);
     }
     
-    function generateForm($data){
-        $item = $data['id'] ? $this->repository->find($data['id']) : $data['model'];
-        $form = $data['form']->setData($item);
-        $form->handleRequest($this->request->getCurrentRequest());
+    function generateForm($title, $entityID, $formId, $id=null, $edit=true){
+        $repository = $this->getDoctrine()->getRepository($entityID);
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $path = $this->generateUrl($request->attributes->get('_route'), []);
+        
+        $item = $id ? $repository->find($id) : new $entityID();
+        $form = $this->createForm($formId, $item, ['disabled' => !$edit]);
+        $form->handleRequest($request);
         
         if($form->isSubmitted() && $form->isValid()) {
-            $this->EM->persist($item);
-            $this->EM->flush();
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($item);
+            $em->flush();
             
-            return new RedirectResponse($this->url['view']);
+            return $this->redirect($path);
         }
         
-        $config = [
-            "title" => $this->title,
-            "cancel" => ["url" => $this->url['view']],
-        ];
-        if($data["id"]) $config["edit"] = ["url" => str_replace("{id}", $data["id"], $this->url['edit'])];
-        
-        return new Response($this->twig->render("@quick_coding.view/component/form.html.twig", 
-            [
-                "item" => $item,
-                "form" => $form->createView(),
-                "config" => $config
-            ]
-        ));
+        return $this->render("@quick_coding.view/component/form.html.twig", [
+            "item" => $item,
+            "form" => $form->createView(),
+            "config" => ["title" => $title, "path" => $path]
+        ]);
     }
     
-    function remove($id){
-        $item = $this->repository->find($id);
-        $this->EM->remove($item);
-        $this->EM->flush();
+    function remove($entityID, $id){
+        $item = $this->getDoctrine()->getRepository($entityID)->find($id);
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($item);
+        $em->flush();
         
-        return new JsonResponse(['success' => true], JsonResponse::HTTP_OK);
+        return $this->json(['success' => true], JsonResponse::HTTP_OK);
     }
     
-    function dataTable($column, $orders, $length, $start, $search){
-        $data = $this->repository->createQueryBuilder('t');
-        $total = $this->repository->createQueryBuilder('t')->select('count(t.id)');
+    function dataTable($entityID, $column, $orders, $length, $start, $search){
+        $repository = $this->getDoctrine()->getRepository($entityID);
+        
+        $data = $repository->createQueryBuilder('t');
+        $total = $repository->createQueryBuilder('t')->select('count(t.id)');
         
         if($search){
             foreach($column as $col){

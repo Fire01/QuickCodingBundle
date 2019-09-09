@@ -1,7 +1,7 @@
 {% extends '@quick_coding.view/layout/base.html.twig' %}
 {% form_theme form '@quick_coding.view/theme/uikit.twig' %}
 
-{% block title %} {{ item.id ? 'Edit' : 'New' }} {{ config.title }} {% endblock %}
+{% block title %} {{ item and item.id ? 'Edit' : 'New' }} {{ config.title }} {% endblock %}
 
 {% block body %}
 {{ form(form, {config: config, item: item}) }}

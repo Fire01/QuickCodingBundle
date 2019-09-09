@@ -32,7 +32,7 @@
 	{%- endif -%}
     	<div class="uk-card uk-card-default uk-border-rounded">
         	<div class="uk-card-header uk-border-rounded">
-        		<h3><b>{{ item.id ? (not form.vars.disabled ? 'Edit ' : '') ~ config.title : 'New ' ~ config.title|default('Form Data') }}</b></h3>
+        		<h3><b>{{ item and item.id ? (not form.vars.disabled ? 'Edit ' : '') ~ config.title : 'New ' ~ config.title|default('Form Data') }}</b></h3>
         	</div>
         	<div class="uk-card-body">
 	{%- if not form.vars.disabled -%}
@@ -54,21 +54,21 @@
         	{%- if not form.vars.disabled -%}
                 {%- if config.submit is not defined or (config.submit is defined and config.submit) -%}
                     <button type="submit" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
-                    	<span uk-icon="icon: check" class="uk-margin-small-right"></span> {{ config.submit.text|default('Save') }}
+                    	<span uk-icon="icon: check" class="uk-margin-small-right"></span> {{ config.submit|default('Save') }}
                     </button>
                 {%- endif -%}
 			{%- else -%}
-				<a href="{{ config.edit.url }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
-                    <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> {{ config.edit.text|default('Edit') }}
+				<a href="{{ config.path ~ '/edit/' ~ item.id }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
+                    <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> {{ config.edit|default('Edit') }}
 				</a> 
             {%- endif -%}
             {%- if config.cancel is not defined or (config.cancel is defined and config.cancel) -%}
                 <a href="{{ config.cancel.url|default('javascript:history.back()') }}" class="uk-button uk-button-danger uk-button-small uk-border-rounded">
                     <span uk-icon="icon: close" class="uk-margin-small-right"></span> 
             		{%- if not form.vars.disabled -%}        
-                        {{ config.cancel.text|default('Cancel') }}
+                        {{ config.cancel|default('Cancel') }}
 					{%- else -%}
-						{{ config.cancel.text|default('Close') }}
+						{{ config.cancel|default('Close') }}
 					{%- endif -%} 
 				</a> 
             {%- endif -%}
@@ -117,7 +117,7 @@
         <div class="uk-form-controls">
             {{- form_widget(form, widget_attr) -}}
             {%- if help is not empty -%}
-            <span class="uk-text-small uk-text-muted uk-display-block">{{ help }}</span>
+            <span class="uk-text-small uk-text-muted uk-display-block qc-help">{{ help }}</span>
             {%- endif -%}
             {{- form_errors(form) -}}
         </div>
