@@ -133,6 +133,10 @@ label.required:after {
     color: #F44336;
 }
 
+p.uk-textarea {
+    min-height: 34px;
+}
+
 .qc-help{
 	font-size:12px;
 }

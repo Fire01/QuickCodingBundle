@@ -1,0 +1,111 @@
+{% extends "@quick_coding.view/layout/base.html.twig" %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset(quick_coding.public ~ "plugins/datatables/dataTables.uikit.min.css") }}" />
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset(quick_coding.public ~ "plugins/datatables/jquery.dataTables.min.js") }}"></script>
+<script src="{{ asset(quick_coding.public ~ "plugins/datatables/dataTables.uikit.min.js") }}"></script>
+<script>
+$(document).ready(function(){
+	var delID = null;
+	var table = $("#view").DataTable({
+        processing: true,
+        serverSide: true,
+        pageLength: 25,
+        orderMulti: true,
+        ajax: {
+            url: "{{ path ~ '/get' }}",
+            data: function(params) {params.type = "json";delete params.columns}
+        },
+        columns: [
+        	{% for item in column %}
+        	{data: "{{ item.name }}", defaultContent: '-'},
+            {% endfor %}
+        	{data: "remove", width:110, orderable:false, defaultContent: `
+            	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
+            		<span uk-icon="icon: file-text"></span>
+            	</button>
+            	<button type="button" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
+        			<span uk-icon="icon: file-edit"></span>
+        		</button>
+        		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
+        			<span uk-icon="icon: minus-circle"></span>
+        		</button>
+            `},
+        ],
+        initComplete : function() {
+            var input = $('.dataTables_filter input').unbind();
+            var self = this.api();
+            var $searchButton = $('<button>')
+				.attr('class', 'uk-button uk-button-primary uk-button-small uk-border-rounded dt-btn-search')
+       			.append('<span uk-icon="icon: search"></span> Search')
+       			.click(function() {self.search(input.val()).draw()});
+
+            $('.dataTables_filter input').on('search', function(e){
+            	self.search(input.val()).draw();
+            })
+   			
+            $('.dataTables_filter').append($searchButton);
+        }
+    });
+
+	$("#view tbody").on( "click", "td .qc-view", function(e){
+		var row = table.row($(e.currentTarget).parents('tr')).data();
+		var path = "{{ path ~ '/read/' }}" + row.Id;
+		document.location = path;
+	})
+
+	$("#view tbody").on( "click", "td .qc-edit", function(e){
+		var row = table.row($(e.currentTarget).parents('tr')).data();
+		var path = "{{ path ~ '/update/' }}" + row.Id;
+		document.location = path;
+	})
+
+	$("#view tbody").on( "click", "td .qc-delete", function(e){
+		var row = table.row($(e.currentTarget).parents('tr')).data();
+		UIkit.modal.confirm('Are you sure want to delete this data {{ title }}?').then(function() {
+			var path = "{{ path ~ '/delete/' }}" + row.Id;
+			$.get(path, function(data, status){
+				if(status === 'success'){
+					$("#view").DataTable().ajax.reload();
+				}
+			});
+		}, function(){});
+	})
+	
+});
+</script>
+{% endblock %}
+
+{% block actionbar %}
+<p uk-margin>
+    <a class="uk-button uk-button-primary uk-button-small uk-border-rounded" href="{{ path ~ '/create' }}">
+    	<span uk-icon="icon: plus-circle"></span> 
+    	New {{ title }}
+    </a>
+</p>
+{% endblock %}
+
+{% block body %}
+<div class="uk-card uk-card-default uk-border-rounded">
+	<div class="uk-card-header uk-border-rounded">
+		<h3><b>{{ title }}</b></h3>
+	</div>
+	<div class="uk-card-body">
+		<table id="view" class="uk-table uk-table-hover uk-table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    {% for item in column %}
+                    <th>{{ item.title }}</th>
+                    {% endfor %}
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+	</div>
+</div>
+{% endblock %}

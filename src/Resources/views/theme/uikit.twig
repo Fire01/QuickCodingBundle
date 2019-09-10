@@ -176,7 +176,7 @@
         <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     {%- else -%}
     	{%- if form.vars.name != "_token" -%}
-    		<p class="uk-input">{{ value }}</p>
+    		<p class="uk-textarea">{{ value }}</p>
     	{%- endif -%}
     {%- endif -%}
 {%- endblock form_widget_simple -%}
@@ -187,7 +187,7 @@
     	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-textarea')|trim }) -%}
         <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 	{%- else -%}
-    	<p class="uk-input">{{ value }}</p>
+    	<p class="uk-textarea">{{ value }}</p>
     {%- endif -%}
 {%- endblock textarea_widget -%}
 
@@ -234,6 +234,6 @@
             {{- block('choice_widget_options') -}}
         </select>
 	{%- else -%}
-    	<p class="uk-input">{%- for choice in choices -%}{%- if choice.value == value -%}{{ choice.label }}{%- endif -%}{%- endfor -%}</p>
+    	<p class="uk-textarea">{%- for choice in choices -%}{%- if choice.value == value -%}{{ choice.label }}{%- endif -%}{%- endfor -%}</p>
     {%- endif -%}
 {%- endblock choice_widget_collapsed -%}
