@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{% block title %}Symfony Starter{% endblock %}</title>
+        <title>{% block title %}{{ quick_coding.app_name }}{% endblock %}</title>
 
         <meta charset="UTF-8">
         <meta name="description" content="Clean and responsive administration panel">
@@ -17,8 +17,9 @@
 		<script src="{{ asset(quick_coding.public ~ 'uikit/js/uikit-icons.min.js') }}"></script>
     </head>
     <body>
-        {% block body %}{% endblock %}
-		<script src="{{ asset(quick_coding.public ~ 'js/jquery.transit.min.js') }}"></script>
+    	<div class="content-background">
+            {% block body %}{% endblock %}
+        </div>
 		{% block javascripts %}{% endblock %}
     </body>
 </html>
