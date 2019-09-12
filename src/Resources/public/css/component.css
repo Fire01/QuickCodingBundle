@@ -255,6 +255,19 @@ table#view thead tr th {
     padding: 0px;
 }
 
+.uk-checkbox {
+    margin: 12px 0px;
+}
+
+.uk-form-controls > div > .custom-label {
+    margin-left: 5px;
+    margin-right: 50px;
+}
+
+.uk-form-controls > div > .uk-radio {
+	margin: 12px 0px;
+}
+
 .tox .tox-toolbar{
     border-top: 0px !important;
 }

@@ -136,14 +136,22 @@
 {%- endblock form_errors %}
 
 {# =========================================================== Form Label ===========================================================#}
+
 {%- block form_label -%}
-	{%- set label_attr = label_attr|merge({ 'class': (label_attr.class|default('') ~ ' uk-form-label')|trim }) -%}
+	{% set sub_prefixes = form.parent.vars.block_prefixes[form.parent.vars.block_prefixes|length - 2] %}
+	{% if sub_prefixes != 'choice' %}
+		{%- set label_attr = label_attr|merge({ 'class': (label_attr.class|default('') ~ ' uk-form-label')|trim }) -%}
+	{% else %}
+		{%- set label_attr = label_attr|merge({ 'class': (label_attr.class|default('') ~ ' custom-label')|trim }) -%}
+	{% endif %}
     {% if label is not same as(false) -%}
         {% if not compound -%}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {%- endif -%}
         {% if required -%}
-            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        	{% if sub_prefixes != 'choice' %}
+                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+            {% endif %}
         {%- endif -%}
         {% if label is empty -%}
             {%- if label_format is not empty -%}
@@ -202,6 +210,17 @@
     </div>
 {%- endblock form_widget_compound -%}
 
+{# =========================================================== Widget Checkbox ===========================================================#}
+{%- block checkbox_widget -%}
+    {%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-checkbox')|trim }) -%}
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{%- endblock checkbox_widget -%}
+
+{# =========================================================== Widget Radio ===========================================================#}
+{%- block radio_widget -%}
+	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-radio')|trim }) -%}
+    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{%- endblock radio_widget -%}
 {# =========================================================== Widget Choice ===========================================================#}
 {%- block choice_widget -%}
     {% if expanded %}
