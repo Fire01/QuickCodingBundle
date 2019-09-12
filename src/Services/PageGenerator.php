@@ -33,7 +33,8 @@ class PageGenerator extends AbstractController {
                 break;
         }
         
-        if($configuration['list'] == 'datatables'){
+        $type = isset($configuration['list']) && $configuration['list'] ? $configuration['list'] : 'datatables';
+        if($type == 'datatables'){
             return $this->generateDataTables($configuration['title'], $configuration['entity'], $configuration['view']);
         }else{
             return $this->generateView($configuration['title'], $configuration['entity'], $configuration['view']);

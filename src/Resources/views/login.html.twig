@@ -1,4 +1,4 @@
-{% extends '__layout/static.html.twig' %}
+{% extends '@quick_coding.view/layout/static.html.twig' %}
 
 {% block title %}{{ quick_coding.app_name }} | Log in{% endblock %}
 
@@ -65,13 +65,14 @@
                                         <a href="#">Forgot your password?</a>
                                     </div>
 									#}
-                                    <div class="uk-margin">
+									
+									<hr />
+									
+                                    <div class="uk-align-right">
                                         <button type="submit" class="uk-button uk-button-primary">
                                             <span class="ion-forward"></span>Login
                                         </button>
                                     </div>
-
-                                    <hr />
                                     
 									{#
                                     <center>
