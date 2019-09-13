@@ -4,6 +4,8 @@ namespace Fire01\QuickCodingBundle\Services;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class PageGenerator extends AbstractController { 
     
@@ -63,12 +65,17 @@ class PageGenerator extends AbstractController {
         $query = $request->query->all();
         
         if(isset($query['type']) && $query['type'] == 'json'){
+            $serializer = new Serializer([new ObjectNormalizer()]);
+            $columns = array_map(function($item) {return $item['name'];}, $view);
+            array_unshift($columns,"id");
+            
             $dataTables = $this->dataTable($entityID, $view, $query["order"], $query["length"], $query["start"], $query["search"]["value"]); 
+            
             return $this->json([
                 "draw"  => $query["draw"],
                 "recordsTotal"  => $dataTables["total"],
                 "recordsFiltered"  => $dataTables["total"],
-                "data"  => $dataTables["data"],
+                "data"  => $serializer->normalize($dataTables["data"], null, ['attributes' => $columns]),
                 "error"  => null
             ], JsonResponse::HTTP_OK);
         }

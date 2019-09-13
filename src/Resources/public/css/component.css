@@ -245,6 +245,10 @@ table#view thead tr th {
     background-color: #28ad7c !important;
 }
 
+.uk-label-success.label-selectize {
+    border: 1px solid #28ad7c !important;
+}
+
 .uk-textarea.tinymce-texteditor{
 	display:block !important;
 	height: 0px;

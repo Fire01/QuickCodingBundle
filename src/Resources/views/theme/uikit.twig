@@ -253,6 +253,16 @@
             {{- block('choice_widget_options') -}}
         </select>
 	{%- else -%}
-    	<p class="uk-textarea">{%- for choice in choices -%}{%- if choice.value == value -%}{{ choice.label }}{%- endif -%}{%- endfor -%}</p>
+    	<p class="uk-textarea">
+    		{% if multiple %}
+    			{% for v in value %}
+    				<span class="uk-label uk-label-success label-selectize">
+    					{%- for choice in choices -%}{%- if choice.value == v -%}{{ choice.label }}{%- endif -%}{%- endfor -%}
+        			</span>
+    			{% endfor %}
+    		{% else %}
+    			{%- for choice in choices -%}{%- if choice.value == value -%}{{ choice.label }}{%- endif -%}{%- endfor -%}
+    		{% endif %}
+    	</p>
     {%- endif -%}
 {%- endblock choice_widget_collapsed -%}

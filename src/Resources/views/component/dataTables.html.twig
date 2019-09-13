@@ -55,20 +55,20 @@ $(document).ready(function(){
 
 	$("#view tbody").on( "click", "td .qc-view", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path ~ '/read/' }}" + row.Id;
+		var path = "{{ path ~ '/read/' }}" + row.id;
 		document.location = path;
 	})
 
 	$("#view tbody").on( "click", "td .qc-edit", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path ~ '/update/' }}" + row.Id;
+		var path = "{{ path ~ '/update/' }}" + row.id;
 		document.location = path;
 	})
 
 	$("#view tbody").on( "click", "td .qc-delete", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		UIkit.modal.confirm('Are you sure want to delete this data {{ title }}?').then(function() {
-			var path = "{{ path ~ '/delete/' }}" + row.Id;
+			var path = "{{ path ~ '/delete/' }}" + row.id;
 			$.get(path, function(data, status){
 				if(status === 'success'){
 					$("#view").DataTable().ajax.reload();
