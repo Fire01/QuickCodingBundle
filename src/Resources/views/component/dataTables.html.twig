@@ -23,7 +23,13 @@ $(document).ready(function(){
         },
         columns: [
         	{% for item in column %}
-        	{data: "{{ item.name }}", defaultContent: '-'},
+        	{data: "{{ item.name }}", defaultContent: '-', render: function ( data, type, row ) {
+            	if(Array.isArray(data)){
+                	return (data.map(v => `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>`)).join('');
+                }
+                
+                return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            }},
             {% endfor %}
         	{data: "remove", width:110, orderable:false, defaultContent: `
             	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
