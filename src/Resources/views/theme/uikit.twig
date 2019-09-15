@@ -32,7 +32,7 @@
 	{%- endif -%}
     	<div class="uk-card uk-card-default uk-border-rounded">
         	<div class="uk-card-header uk-border-rounded">
-        		<h3><b>{{ item and item.id ? (not form.vars.disabled ? 'Edit ' : '') ~ config.title : 'New ' ~ config.title|default('Form Data') }}</b></h3>
+        		<h3><b>{{ config.title|default('Form') }}</b></h3>
         	</div>
         	<div class="uk-card-body">
 	{%- if not form.vars.disabled -%}
@@ -43,7 +43,6 @@
 	{%- else -%}
 				<form class="uk-form-horizontal">
 	{%- endif -%}
-	
 {%- endblock form_start -%}
 
 {%- block form_end -%}
@@ -52,26 +51,21 @@
             {%- endif -%}
         	<div class="uk-custom-footer uk-border-rounded">
         	{%- if not form.vars.disabled -%}
-                {%- if config.submit is not defined or (config.submit is defined and config.submit) -%}
-                    <button type="submit" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
-                    	<span uk-icon="icon: check" class="uk-margin-small-right"></span> {{ config.submit|default('Save') }}
-                    </button>
-                {%- endif -%}
-			{%- else -%}
-				<a href="{{ config.path ~ '/update/' ~ item.id }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
-                    <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> {{ config.edit|default('Edit') }}
-				</a> 
+                <button type="submit" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
+                    <span uk-icon="icon: check" class="uk-margin-small-right"></span> {{ submit.text|default('Save') }}
+                </button>
             {%- endif -%}
-            {%- if config.cancel is not defined or (config.cancel is defined and config.cancel) -%}
-                <a href="{{ config.cancel.url|default('javascript:history.back()') }}" class="uk-button uk-button-danger uk-button-small uk-border-rounded">
-                    <span uk-icon="icon: close" class="uk-margin-small-right"></span> 
-            		{%- if not form.vars.disabled -%}        
-                        {{ config.cancel|default('Cancel') }}
-					{%- else -%}
-						{{ config.cancel|default('Close') }}
-					{%- endif -%} 
+            {% if buttons is defined %}
+                {% for button in buttons %}
+            	<a href="{{ button.url }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
+                    <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> {{ button.text }}
+				</a>
+                {% endfor %}
+            {% endif %}
+            
+            	<a href="{{ cancel.url|default('javascript:history.back()') }}" class="uk-button uk-button-danger uk-button-small uk-border-rounded">
+                    <span uk-icon="icon: close" class="uk-margin-small-right"></span> {{ config.close.text|default('Close') }}
 				</a> 
-            {%- endif -%}
             </div>
             </form>
         </div>
@@ -128,11 +122,18 @@
 {% block form_errors -%}
     {%- if errors|length > 0 -%}
     	{%- for error in errors -%}
+    		{%- if errors.form.parent -%}
             <span class="uk-text-small uk-text-danger uk-display-block">
                 {{ error.message }}
         	</span>
+        	{%- else -%}
+        		<div class="uk-alert-danger" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p>{{ error.message }}</p>
+                </div>
+        	{%- endif -%}
         {%- endfor -%}
-    {%- endif %}
+    {%- endif -%}
 {%- endblock form_errors %}
 
 {# =========================================================== Form Label ===========================================================#}
@@ -266,3 +267,21 @@
     	</p>
     {%- endif -%}
 {%- endblock choice_widget_collapsed -%}
+
+{# =========================================================== Button Rows ===========================================================#}
+{%- block button_widget -%}
+	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-button uk-button-primary uk-button-small uk-border-rounded')|trim }) -%}
+    {%- if label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- elseif label is same as(false) -%}
+            {% set translation_domain = false %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+{%- endblock button_widget -%}

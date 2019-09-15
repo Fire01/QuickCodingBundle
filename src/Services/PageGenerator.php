@@ -101,9 +101,11 @@ class PageGenerator extends AbstractController {
         }
         
         return $this->render("@quick_coding.view/component/form.html.twig", [
+            "title" => $title,
+            "path" => $path,
             "item" => $item,
             "form" => $form->createView(),
-            "config" => ["title" => $title, "path" => $path]
+            "buttons"
         ]);
     }
     

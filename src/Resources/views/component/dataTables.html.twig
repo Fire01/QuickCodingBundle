@@ -1,6 +1,6 @@
 {% extends "@quick_coding.view/layout/base.html.twig" %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %} {{ config.title }} {% endblock %}
 
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset(quick_coding.public ~ "plugins/datatables/dataTables.uikit.min.css") }}" />
@@ -18,11 +18,11 @@ $(document).ready(function(){
         pageLength: 25,
         orderMulti: true,
         ajax: {
-            url: "{{ path ~ '/get' }}",
+            url: "{{ path(config.path) }}",
             data: function(params) {params.type = "json";delete params.columns}
         },
         columns: [
-        	{% for item in column %}
+        	{% for item in config.column %}
         	{data: "{{ item.name }}", defaultContent: '-', render: function ( data, type, row ) {
             	if(Array.isArray(data)){
                 	return (data.map(v => `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>`)).join('');
@@ -61,20 +61,20 @@ $(document).ready(function(){
 
 	$("#view tbody").on( "click", "td .qc-view", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path ~ '/read/' }}" + row.id;
+		var path = "{{ path(config.path, {action: 'read'}) }}" + "/" + row.id;
 		document.location = path;
 	})
 
 	$("#view tbody").on( "click", "td .qc-edit", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path ~ '/update/' }}" + row.id;
+		var path = "{{ path(config.path, {action: 'update'}) }}" + "/" + row.id;
 		document.location = path;
 	})
 
 	$("#view tbody").on( "click", "td .qc-delete", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		UIkit.modal.confirm('Are you sure want to delete this data {{ title }}?').then(function() {
-			var path = "{{ path ~ '/delete/' }}" + row.id;
+		UIkit.modal.confirm('Are you sure want to delete data {{ config.title }}?').then(function() {
+			var path = "{{ path(config.path, {action: 'delete'}) }}" + "/" + row.id;
 			$.get(path, function(data, status){
 				if(status === 'success'){
 					$("#view").DataTable().ajax.reload();
@@ -88,24 +88,22 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block actionbar %}
-<p uk-margin>
-    <a class="uk-button uk-button-primary uk-button-small uk-border-rounded" href="{{ path ~ '/create' }}">
-    	<span uk-icon="icon: plus-circle"></span> 
-    	New {{ title }}
-    </a>
-</p>
+<a class="uk-button uk-button-primary uk-button-small uk-border-rounded" href="{{ path(config.path, {action: 'create'}) }}">
+	<span uk-icon="icon: plus-circle"></span> 
+	Create {{ config.title }}
+</a>
 {% endblock %}
 
 {% block body %}
 <div class="uk-card uk-card-default uk-border-rounded">
 	<div class="uk-card-header uk-border-rounded">
-		<h3><b>{{ title }}</b></h3>
+		<h3><b>{{ config.title }}</b></h3>
 	</div>
 	<div class="uk-card-body">
 		<table id="view" class="uk-table uk-table-hover uk-table-striped" style="width:100%">
             <thead>
                 <tr>
-                    {% for item in column %}
+                    {% for item in config.column %}
                     <th>{{ item.title }}</th>
                     {% endfor %}
                     <th></th>
