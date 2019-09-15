@@ -17,13 +17,14 @@ class Config {
     }
     
     function set(array $config){
-        $this->title = isset($config['title']) && $config['title'] ? $config['title'] : null;
-        $this->entity = isset($config['entity']) && $config['entity'] ? $config['entity'] : null;
-        $this->form = isset($config['form']) && $config['form'] ? $config['form'] : null;
-        $this->column = isset($config['column']) && $config['column'] ? $config['column'] : [];
-        $this->path = isset($config['path']) && $config['path'] ? $config['path'] : null;
-        $this->action = isset($config['action']) && $config['action'] ? $config['action'] : null;
-        $this->actionbar = isset($config['actionbar']) && $config['actionbar'] ? $config['actionbar'] : [];
+        $this->setTitle(isset($config['title']) && $config['title'] ? $config['title'] : null);
+        $this->setEntity(isset($config['entity']) && $config['entity'] ? $config['entity'] : null);
+        $this->setForm(isset($config['form']) && $config['form'] ? $config['form'] : null);
+        $this->setColumn(isset($config['column']) && $config['column'] ? $config['column'] : []);
+        $this->setViewType(isset($config['viewType']) && $config['viewType'] ? $config['viewType'] : null);
+        
+        $this->setPath(isset($config['path']) && $config['path'] ? $config['path'] : null);
+        $this->setAction(isset($config['action']) && $config['action'] ? $config['action'] : null);
     }
     
     function all(){
@@ -35,17 +36,15 @@ class Config {
             'column'    => $this->getColumn(),
             'path'      => $this->getPath(),
             'action'    => $this->getAction(),
+            'actionbar' => $this->getActionbar(),
         ];
     }
     
-    function getTitle(): string{
-        $title = $this->title;
-        if(!$this->title) $title = $this->readable(substr(strrchr($this->entity, '\\'), 1));
-        
-        return $this->readable($this->action . $title);
+    function getTitle(){
+        return $this->title;
     }
     
-    function setTitle(string $title){
+    function setTitle(?string $title){
         $this->title = $title;
     }
     
@@ -53,31 +52,32 @@ class Config {
         return $this->entity;
     }
     
-    function setEntity($entity){
+    function setEntity($entity=null){
         $this->entity = $entity;
+        if(!$this->title) $this->title = $this->readable(substr(strrchr($this->entity, '\\'), 1));
     }
     
     function getForm(){
         return $this->form;
     }
     
-    function setForm($form){
+    function setForm($form=null){
         $this->form = $form;
     }
     
     function getViewType(){
-        return $this->viewType ? $this->viewType : 'DataTables';
+        return $this->viewType;
     }
     
-    function setViewType(string $viewType){
-        $this->viewType = $viewType;
+    function setViewType(?string $viewType){
+        $this->viewType = $viewType ? $viewType : 'DataTables';
     }
     
     function getColumn(): array{
         return $this->column ? $this->column : [];
     }
     
-    function setColumn(array $column){
+    function setColumn(?array $column){
         $this->column = $column;
     }
     
@@ -85,15 +85,15 @@ class Config {
         return $this->path;
     }
     
-    function setPath(string $path){
+    function setPath(?string $path){
         $this->path = $path;
     }
     
-    function getAction(): string{
+    function getAction(){
         return $this->action;
     }
     
-    function setAction(string $action){
+    function setAction(?string $action){
         $this->action = $action;
     }
     
@@ -101,7 +101,15 @@ class Config {
         return $this->actionbar;
     }
     
-    function addActionbar(Action $action){
+    function addActionbar(Action $action){        
+        if($action->getId() == '{auto}'){
+            $action->setId($action->getType() . '_' . substr(md5(uniqid(mt_rand(), true)), 0, 6));
+        }
+        
+        foreach ($this->getActionbar() as $item){
+            if($action->getId() == $item->getId()){throw new \Exception('Action with id "' . $item->getId() . '" already exist!');}
+        }
+       
         $this->actionbar[] = $action;
     }
     
@@ -114,6 +122,8 @@ class Config {
         $action->setText($text);
         $action->setType('submit');
         $action->setTarget($target);
+        $action->setIcon('check');
+        $action->setClick("$('form" . ($action->getTarget() ? "[name=\"form_" . $action->getTarget() . "\"]" : "") . "').find('> button[type=submit]').click()");
         
         $this->addActionbar($action);
     }
@@ -121,8 +131,11 @@ class Config {
     function addActionbarClose($text='Close', $path=null){
         $action = new Action();
         $action->setText($text);
-        $action->setType('close');
+        $action->setType('link');
+        $action->setClass('uk-button-danger');
         $action->setPath($path ? $path : $this->path);
+        $action->setTarget('route');
+        $action->setIcon('close');
         
         $this->addActionbar($action);
     }

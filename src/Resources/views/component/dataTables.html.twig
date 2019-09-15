@@ -88,10 +88,7 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block actionbar %}
-<a class="uk-button uk-button-primary uk-button-small uk-border-rounded" href="{{ path(config.path, {action: 'create'}) }}">
-	<span uk-icon="icon: plus-circle"></span> 
-	Create {{ config.title }}
-</a>
+{% include '@quick_coding.view/theme/actionbar.twig' with {actionbar: config.actionbar} %}
 {% endblock %}
 
 {% block body %}

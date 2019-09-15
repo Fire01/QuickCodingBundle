@@ -184,6 +184,10 @@ p.uk-textarea {
     padding: 25px;
 }
 
+#action-bar .uk-button {
+    margin-right: 20px;
+}
+
 #__ajaxLoading .uk-modal-dialog{
 	width: 200px;
     text-align: center;

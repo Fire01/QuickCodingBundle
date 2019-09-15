@@ -49,24 +49,7 @@
             {%- if not render_rest is defined or render_rest -%}
                 {{ form_rest(form) }}
             {%- endif -%}
-        	<div class="uk-custom-footer uk-border-rounded">
-        	{%- if not form.vars.disabled -%}
-                <button type="submit" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
-                    <span uk-icon="icon: check" class="uk-margin-small-right"></span> {{ submit.text|default('Save') }}
-                </button>
-            {%- endif -%}
-            {% if buttons is defined %}
-                {% for button in buttons %}
-            	<a href="{{ button.url }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded">
-                    <span uk-icon="icon: pencil" class="uk-margin-small-right"></span> {{ button.text }}
-				</a>
-                {% endfor %}
-            {% endif %}
-            
-            	<a href="{{ cancel.url|default('javascript:history.back()') }}" class="uk-button uk-button-danger uk-button-small uk-border-rounded">
-                    <span uk-icon="icon: close" class="uk-margin-small-right"></span> {{ config.close.text|default('Close') }}
-				</a> 
-            </div>
+                <button type="submit" style="display:none">system_submit_button</button>
             </form>
         </div>
     </div>
@@ -102,7 +85,6 @@
 	{%- endif -%}
 	
 {%- endblock form_end -%}
-
 {# =========================================================== Form Rows ===========================================================#}
 {%- block form_row -%}
     {%- set widget_attr = {} -%}

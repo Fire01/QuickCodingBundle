@@ -20,11 +20,6 @@
         {% include ['_qc/sidebar.html.twig', '@quick_coding.view/layout/sidebar.html.twig'] ignore missing %}
         
         <div id="body-content" class="content-padder content-background">
-        	{% if actionbar is defined %}
-        		<div uk-sticky="offset: 80" id="action-bar" class="uk-card uk-card-default uk-card-body uk-margin">
-                    {{ dump(actionbar.children) }}
-                </div>
-        	{% endif %}
         	
         	{% if block('actionbar') is defined and block('actionbar') is not empty %}
             <div uk-sticky="offset: 80" id="action-bar" class="uk-card uk-card-default uk-card-body uk-margin">

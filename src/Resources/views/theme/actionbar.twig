@@ -1,0 +1,22 @@
+{%- block actionbar -%}
+	{% for action in actionbar %}
+		{% set class = 'uk-button uk-button-small uk-border-rounded uk-button-primary' ~ (action.class ? ' ' ~ action.class : '') %}
+		{% if action.type == 'link' %}
+			{% set href = action.target == 'route' ? path(action.path)  : action.path %}
+			<a href="{{ href }}" class="{{ class }}">
+				{% if action.icon %}
+                	<span uk-icon="icon: {{ action.icon }}"></span>
+                {% endif %} 
+                {{ action.text|default('{link}') }}
+			</a>
+		{% else %}
+			{% set click = action.click %}
+			<button type="button" class="{{ class }}" onclick="{{ click }}">
+                {% if action.icon %}
+                	<span uk-icon="icon: {{ action.icon }}"></span>
+                {% endif %} 
+                {{ action.text|default('{button}') }}
+            </button>
+		{% endif %}
+	{% endfor %}
+{%- endblock actionbar -%}

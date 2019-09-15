@@ -6,6 +6,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Fire01\QuickCodingBundle\Entity\Config;
+use Fire01\QuickCodingBundle\Entity\Action;
 
 class Builder extends AbstractController {
     
@@ -45,6 +46,13 @@ class Builder extends AbstractController {
     }
     
     function generateView(){
+        $this->config->addActionbar(new Action([
+            'type' => 'link',
+            'text' => 'Create ' . $this->config->getTitle(),
+            'icon' => 'plus-circle',
+            'path' => $this->generateUrl($this->config->getPath(), ['action' => 'create']),
+        ]));
+        
         switch ($this->config->getViewType()){
             case 'Native':
                 throw new \Exception('TODO: createViewNative');
@@ -65,6 +73,18 @@ class Builder extends AbstractController {
         $item = $id ? $repository->find($id) : new $entity();
         $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
         $form->handleRequest($request);
+        
+        $this->config->addActionbarClose();
+        if($edit){
+            $this->config->addActionbarSave();
+        }else{
+            $this->config->addActionbar(new Action([
+                'type' => 'link', 
+                'text' => 'Edit', 
+                'icon' => 'pencil',
+                'path' => $this->generateUrl($this->config->getPath(), ['action' => 'update', 'id' => $item->getId()])
+            ]));
+        }
         
         if($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
