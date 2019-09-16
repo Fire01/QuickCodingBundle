@@ -10,6 +10,7 @@ class Action {
     protected $icon;
     
     protected $path;
+    protected $params;
     protected $target;
     protected $click;
     
@@ -25,6 +26,7 @@ class Action {
         $this->setIcon(isset($config['icon']) && $config['icon'] ? $config['icon'] : null);
         
         $this->setPath(isset($config['path']) && $config['path'] ? $config['path'] : null);
+        $this->setParams(isset($config['params']) && $config['params'] ? $config['params'] : null);
         $this->setTarget(isset($config['target']) && $config['target'] ? $config['target'] : null);
         $this->setClick(isset($config['click']) && $config['click'] ? $config['click'] : null);
     }
@@ -37,6 +39,7 @@ class Action {
             'text'  => $this->getText(),
             'icon'  => $this->getIcon(),
             'path'  => $this->getPath(),
+            'params'=> $this->getParams(),
             'target'=> $this->getTarget(),
             'click' => $this->getClick(),
         ];
@@ -88,6 +91,14 @@ class Action {
     
     function setPath($path=null){
         $this->path = $path;
+    }
+    
+    function getParams(): array{
+        return $this->params ? $this->params : [];
+    }
+    
+    function setParams($params=[]){
+        $this->params = $params;
     }
     
     function getTarget(){

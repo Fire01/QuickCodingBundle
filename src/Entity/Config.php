@@ -8,7 +8,7 @@ class Config {
     protected $form;
     protected $viewType;
     protected $column;
-    protected $path;
+    protected $path = ['view' => null, 'form' => null, 'remove' => null];
     protected $action;
     protected $actionbar = [];
     
@@ -81,12 +81,38 @@ class Config {
         $this->column = $column;
     }
     
-    function getPath(){
+    function getPath(): array{
         return $this->path;
     }
     
-    function setPath(?string $path){
-        $this->path = $path;
+    function setPath($path=null){
+        $this->setPathView(is_array($path) ? (isset($path['view']) ? $path['view'] : null) : $path);
+        $this->setPathForm(is_array($path) ? (isset($path['form']) ? $path['form'] : null) : $path);
+        $this->setPathRemove(is_array($path) ? (isset($path['remove']) ? $path['remove'] : null) : $path);
+    }
+    
+    function getPathView(){
+        return $this->path['view'];
+    }
+    
+    function setPathView($path){
+        $this->path['view'] = $path;
+    }
+    
+    function getPathForm(){
+        return $this->path['form'];
+    }
+    
+    function setPathForm($path){
+        $this->path['form'] = $path;
+    }
+    
+    function getPathRemove(){
+        return $this->path['remove'];
+    }
+    
+    function setPathRemove($path){
+        $this->path['remove'] = $path;
     }
     
     function getAction(){
@@ -117,9 +143,9 @@ class Config {
         $this->actionbar = [];
     }
     
-    function addActionbarSave($text='Save', $target=null){
+    function addActionbarFormSave($text=null, $target=null){
         $action = new Action();
-        $action->setText($text);
+        $action->setText($text ? $text : 'Save');
         $action->setType('submit');
         $action->setTarget($target);
         $action->setIcon('check');
@@ -128,12 +154,12 @@ class Config {
         $this->addActionbar($action);
     }
     
-    function addActionbarClose($text='Close', $path=null){
+    function addActionbarFormClose($text=null, $path=null){
         $action = new Action();
-        $action->setText($text);
+        $action->setText($text ? $text : 'Close');
         $action->setType('link');
         $action->setClass('uk-button-danger');
-        $action->setPath($path ? $path : $this->path);
+        $action->setPath($path ? $path : $this->getPathView());
         $action->setTarget('route');
         $action->setIcon('close');
         

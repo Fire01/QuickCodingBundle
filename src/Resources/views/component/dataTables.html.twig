@@ -18,7 +18,7 @@ $(document).ready(function(){
         pageLength: 25,
         orderMulti: true,
         ajax: {
-            url: "{{ path(config.path) }}",
+            url: "{{ path(config.path.view) }}",
             data: function(params) {params.type = "json";delete params.columns}
         },
         columns: [
@@ -61,20 +61,23 @@ $(document).ready(function(){
 
 	$("#view tbody").on( "click", "td .qc-view", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path(config.path, {action: 'read'}) }}" + "/" + row.id;
+		var path = "{{ path(config.path.form, {action: 'read', id: '0000'}) }}";
+		path = path.replace("0000", row.id);
 		document.location = path;
 	})
 
 	$("#view tbody").on( "click", "td .qc-edit", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path(config.path, {action: 'update'}) }}" + "/" + row.id;
+		var path = "{{ path(config.path.form, {action: 'update', id: '0000'}) }}";
+		path = path.replace("0000", row.id);
 		document.location = path;
 	})
 
 	$("#view tbody").on( "click", "td .qc-delete", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		UIkit.modal.confirm('Are you sure want to delete data {{ config.title }}?').then(function() {
-			var path = "{{ path(config.path, {action: 'delete'}) }}" + "/" + row.id;
+			var path = "{{ path(config.path.remove, {action: 'delete', id: '0000'}) }}";
+			path = path.replace("0000", row.id);
 			$.get(path, function(data, status){
 				if(status === 'success'){
 					$("#view").DataTable().ajax.reload();
@@ -88,7 +91,7 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block actionbar %}
-{% include '@quick_coding.view/theme/actionbar.twig' with {actionbar: config.actionbar} %}
+{% include '@quick_coding.view/component/actionbar.twig' with {actionbar: config.actionbar} %}
 {% endblock %}
 
 {% block body %}

@@ -14,6 +14,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('app_name')->defaultValue('Quick Coding')->info('Quick Coding App Name')->end()
                 ->scalarNode('app_logo')->defaultValue('')->info('Quick Coding App Logo')->end()
+                ->scalarNode('app_home')->info('Quick Coding App Home')->end()
             ->end();
         
         return $treeBuilder;

@@ -2,8 +2,9 @@
 	{% for action in actionbar %}
 		{% set class = 'uk-button uk-button-small uk-border-rounded uk-button-primary' ~ (action.class ? ' ' ~ action.class : '') %}
 		{% if action.type == 'link' %}
-			{% set href = action.target == 'route' ? path(action.path)  : action.path %}
-			<a href="{{ href }}" class="{{ class }}">
+			{% set href = action.target == 'route' ? path(action.path, action.params)  : action.path %}
+			{% set target = action.target == 'route' ? '_self' : action.target  %}
+			<a href="{{ href }}" class="{{ class }}" target="{{ target|default('_self') }}">
 				{% if action.icon %}
                 	<span uk-icon="icon: {{ action.icon }}"></span>
                 {% endif %} 

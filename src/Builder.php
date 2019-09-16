@@ -1,5 +1,5 @@
 <?php 
-namespace Fire01\QuickCodingBundle\Services;
+namespace Fire01\QuickCodingBundle;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Serializer;
@@ -7,6 +7,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Fire01\QuickCodingBundle\Entity\Config;
 use Fire01\QuickCodingBundle\Entity\Action;
+use Fire01\QuickCodingBundle\Services\Validator;
 
 class Builder extends AbstractController {
     
@@ -21,11 +22,12 @@ class Builder extends AbstractController {
     }
 
     function build(){
+        Validator::build($this->config);
+        
         $request = $this->get('request_stack')->getCurrentRequest();
+        $this->config->setPath($request->attributes->get('_route'));
         $action = strtolower($request->attributes->get('_route_params')['action']);
         $id = $request->attributes->get('id');
-        
-        $this->config->setPath($request->attributes->get('_route'));
        
         switch($action){
             case 'create':
@@ -45,12 +47,25 @@ class Builder extends AbstractController {
         return $this->generateView();
     }
     
-    function generateView(){
+    function generateView($pathNew=null){
+        Validator::view($this->config);
+        
+        $this->config->addActionbar(new Action([
+            'type' => 'link',
+            'class' => 'uk-button-danger',
+            'text' => 'Close',
+            'icon' => 'close',
+            'path' => $this->getParameter('quick_coding.app_home'),
+            'target' => 'route'
+        ]));
+        
         $this->config->addActionbar(new Action([
             'type' => 'link',
             'text' => 'Create ' . $this->config->getTitle(),
             'icon' => 'plus-circle',
-            'path' => $this->generateUrl($this->config->getPath(), ['action' => 'create']),
+            'path' => $this->config->getPathForm(),
+            'params' => ['action' => 'create'],
+            'target' => 'route'
         ]));
         
         switch ($this->config->getViewType()){
@@ -66,6 +81,8 @@ class Builder extends AbstractController {
     }
     
     function generateForm($id=null, $edit=true){
+        Validator::form($this->config);
+        
         $request = $this->get('request_stack')->getCurrentRequest();
         $repository = $this->getDoctrine()->getRepository($this->config->getEntity());
         $entity = $this->config->getEntity();
@@ -74,15 +91,17 @@ class Builder extends AbstractController {
         $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
         $form->handleRequest($request);
         
-        $this->config->addActionbarClose();
+        $this->config->addActionbarFormClose();
         if($edit){
-            $this->config->addActionbarSave();
+            $this->config->addActionbarFormSave();
         }else{
             $this->config->addActionbar(new Action([
                 'type' => 'link', 
                 'text' => 'Edit', 
                 'icon' => 'pencil',
-                'path' => $this->generateUrl($this->config->getPath(), ['action' => 'update', 'id' => $item->getId()])
+                'path' => $this->config->getPathForm(),
+                'params' => ['action' => 'update', 'id' => $item->getId()],
+                'target' => 'route'
             ]));
         }
         
@@ -91,22 +110,25 @@ class Builder extends AbstractController {
             $em->persist($item);
             $em->flush();
             
-            return $this->redirectToRoute($this->config->getPath());
+            return $this->redirectToRoute($this->config->getPathView());
         }
         
         return $this->render("@quick_coding.view/component/form.html.twig", ["config" => $this->config, "form" => $form->createView()]);
     }
     
     function removeData($id){
+        $isAjax = $this->get('request_stack')->getCurrentRequest()->isXmlHttpRequest();
+        Validator::remove($this->config, $isAjax);
+        
         $item = $this->getDoctrine()->getRepository($this->config->getEntity())->find($id);
         $em = $this->getDoctrine()->getManager();
         $em->remove($item);
         $em->flush();
         
-        if($this->get('request_stack')->getCurrentRequest()->isXmlHttpRequest()){
+        if($isAjax){
             return $this->json(['success' => true], JsonResponse::HTTP_OK);
         }else{
-            return $this->redirectToRoute($this->config->getPath());
+            return $this->redirectToRoute($this->config->getPathView());
         }
     }
     
@@ -128,7 +150,6 @@ class Builder extends AbstractController {
     function generateViewDataTables(){
         $request = $this->get('request_stack')->getCurrentRequest();
         $query = $request->query->all();
-        
         if(isset($query['type']) && $query['type'] == 'json'){
             
             $serializer = new Serializer([new ObjectNormalizer()]);
@@ -136,7 +157,6 @@ class Builder extends AbstractController {
             array_unshift($column,'id');
             
             $DataTablesJSON = $this->getDataDataTables($query['order'], $query['length'], $query['start'], $query['search']['value']);
-            
             return $this->json([
                 'draw'              => $query['draw'],
                 'recordsTotal'      => $DataTablesJSON['total'],
@@ -145,7 +165,8 @@ class Builder extends AbstractController {
                 'error'             => null
             ], JsonResponse::HTTP_OK);
         }
-        
+        //dump($this->generateUrl('delete_configuration', ['action' => 'delete', 'id' => '0']));
+        //dump($this->config);die;
         return $this->render('@quick_coding.view/component/dataTables.html.twig', ['config' => $this->config]);
     }
     
