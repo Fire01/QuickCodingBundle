@@ -4,7 +4,7 @@
     <services>
     	
     	<!-- Builder Service -->
-        <service id="quick_coding.builder" class="Fire01\QuickCodingBundle\Builder" autowire="true" autoconfigure="true" public="false">
+        <service id="quick_coding.builder" class="Fire01\QuickCodingBundle\Builder" autowire="true" autoconfigure="true">
         </service>
 
         <service id="Fire01\QuickCodingBundle\Builder" alias="quick_coding.builder" />

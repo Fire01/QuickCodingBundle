@@ -4,17 +4,20 @@ namespace Fire01\QuickCodingBundle;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Fire01\QuickCodingBundle\Entity\Config;
 use Fire01\QuickCodingBundle\Entity\Action;
 use Fire01\QuickCodingBundle\Services\Validator;
+use Fire01\QuickCodingBundle\Event\BuilderEvent;
 
 class Builder extends AbstractController {
+     
+    private $eventDispatcher;
+    private $config;
     
-    protected $config;
-    
-    function __construct(array $config=[]){
+    function __construct(array $config=[], EventDispatcherInterface $eventDispatcher){
         $this->config = new Config();
+        $this->eventDispatcher = $eventDispatcher;
     }
     
     function setConfig(array $config){
@@ -106,6 +109,13 @@ class Builder extends AbstractController {
         }
         
         if($form->isSubmitted() && $form->isValid()) {
+            
+            $event = new BuilderEvent($request, $item);
+            
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch('quick_coding.builder_form_before_save', $event);
+            }
+            
             $em = $this->getDoctrine()->getManager();
             $em->persist($item);
             $em->flush();
@@ -126,10 +136,14 @@ class Builder extends AbstractController {
         $em->flush();
         
         if($isAjax){
-            return $this->json(['success' => true], JsonResponse::HTTP_OK);
+            return $this->json(['success' => true]);
         }else{
             return $this->redirectToRoute($this->config->getPathView());
         }
+    }
+    
+    function addListener($eventName, $listener, $priority = 0){
+        return $this->eventDispatcher->addListener($eventName, $listener, $priority);
     }
     
     function generateViewNative(){
@@ -163,7 +177,7 @@ class Builder extends AbstractController {
                 'recordsFiltered'   => $DataTablesJSON['total'],
                 'data'              => $serializer->normalize($DataTablesJSON['data'], null, ['attributes' => $column]),
                 'error'             => null
-            ], JsonResponse::HTTP_OK);
+            ]);
         }
         //dump($this->generateUrl('delete_configuration', ['action' => 'delete', 'id' => '0']));
         //dump($this->config);die;
