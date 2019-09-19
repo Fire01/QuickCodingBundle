@@ -53,23 +53,24 @@ class Builder extends AbstractController {
     function generateView($pathNew=null){
         Validator::view($this->config);
         
-        $this->config->addActionbar(new Action([
-            'type' => 'link',
-            'class' => 'uk-button-danger',
-            'text' => 'Close',
-            'icon' => 'close',
-            'path' => $this->getParameter('quick_coding.app_home'),
-            'target' => 'route'
-        ]));
-        
-        $this->config->addActionbar(new Action([
-            'type' => 'link',
-            'text' => 'Create ' . $this->config->getTitle(),
-            'icon' => 'plus-circle',
-            'path' => $this->config->getPathForm(),
-            'params' => ['action' => 'create'],
-            'target' => 'route'
-        ]));
+        $this->config
+            ->addActionbar(new Action([
+                'type' => 'link',
+                'class' => 'uk-button-danger',
+                'text' => 'Close',
+                'icon' => 'close',
+                'path' => $this->getParameter('quick_coding.app_home'),
+                'target' => 'route'
+            ]))
+            ->addActionbar(new Action([
+                'type' => 'link',
+                'text' => 'Create ' . $this->config->getTitle(),
+                'icon' => 'plus-circle',
+                'path' => $this->config->getPathForm(),
+                'params' => ['action' => 'create'],
+                'target' => 'route'
+            ]))
+        ;
         
         switch ($this->config->getViewType()){
             case 'Native':
@@ -109,13 +110,13 @@ class Builder extends AbstractController {
         }
         
         if($form->isSubmitted() && $form->isValid()) {
-            
-            $event = new BuilderEvent($request, $item);
+
+            $event = new BuilderEvent($form, $item);
             
             if ($this->eventDispatcher) {
                 $this->eventDispatcher->dispatch('quick_coding.builder_form_before_save', $event);
             }
-            
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($item);
             $em->flush();
@@ -179,8 +180,6 @@ class Builder extends AbstractController {
                 'error'             => null
             ]);
         }
-        //dump($this->generateUrl('delete_configuration', ['action' => 'delete', 'id' => '0']));
-        //dump($this->config);die;
         return $this->render('@quick_coding.view/component/dataTables.html.twig', ['config' => $this->config]);
     }
     

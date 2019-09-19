@@ -46,6 +46,8 @@ class Config {
     
     function setTitle(?string $title){
         $this->title = $title;
+        
+        return $this;
     }
     
     function getEntity(){
@@ -55,6 +57,8 @@ class Config {
     function setEntity($entity=null){
         $this->entity = $entity;
         if(!$this->title) $this->title = $this->readable(substr(strrchr($this->entity, '\\'), 1));
+        
+        return $this;
     }
     
     function getForm(){
@@ -63,6 +67,8 @@ class Config {
     
     function setForm($form=null){
         $this->form = $form;
+        
+        return $this;
     }
     
     function getViewType(){
@@ -71,6 +77,8 @@ class Config {
     
     function setViewType(?string $viewType){
         $this->viewType = $viewType ? $viewType : 'DataTables';
+        
+        return $this;
     }
     
     function getColumn(): array{
@@ -79,6 +87,8 @@ class Config {
     
     function setColumn(?array $column){
         $this->column = $column;
+        
+        return $this;
     }
     
     function getPath(): array{
@@ -89,6 +99,8 @@ class Config {
         $this->setPathView(is_array($path) ? (isset($path['view']) ? $path['view'] : null) : $path);
         $this->setPathForm(is_array($path) ? (isset($path['form']) ? $path['form'] : null) : $path);
         $this->setPathRemove(is_array($path) ? (isset($path['remove']) ? $path['remove'] : null) : $path);
+        
+        return $this;
     }
     
     function getPathView(){
@@ -97,6 +109,8 @@ class Config {
     
     function setPathView($path){
         $this->path['view'] = $path;
+        
+        return $this;
     }
     
     function getPathForm(){
@@ -105,6 +119,8 @@ class Config {
     
     function setPathForm($path){
         $this->path['form'] = $path;
+        
+        return $this;
     }
     
     function getPathRemove(){
@@ -113,6 +129,8 @@ class Config {
     
     function setPathRemove($path){
         $this->path['remove'] = $path;
+        
+        return $this;
     }
     
     function getAction(){
@@ -121,6 +139,8 @@ class Config {
     
     function setAction(?string $action){
         $this->action = $action;
+        
+        return $this;
     }
     
     function getActionbar(): array{
@@ -133,14 +153,18 @@ class Config {
         }
         
         foreach ($this->getActionbar() as $item){
-            if($action->getId() == $item->getId()){throw new \Exception('Action with id "' . $item->getId() . '" already exist!');}
+            if($action->getId() == $item->getId()){throw new \Exception(sprintf('Action with id "%s" already exist!', $item->getId()));}
         }
        
         $this->actionbar[] = $action;
+        
+        return $this;
     }
     
     function clearActionbar(){
         $this->actionbar = [];
+        
+        return $this;
     }
     
     function addActionbarFormSave($text=null, $target=null){
@@ -152,6 +176,8 @@ class Config {
         $action->setClick("$('form" . ($action->getTarget() ? "[name=\"form_" . $action->getTarget() . "\"]" : "") . "').find('> button[type=submit]').click()");
         
         $this->addActionbar($action);
+        
+        return $this;
     }
     
     function addActionbarFormClose($text=null, $path=null){
@@ -164,6 +190,8 @@ class Config {
         $action->setIcon('close');
         
         $this->addActionbar($action);
+        
+        return $this;
     }
     
     function readable($string){

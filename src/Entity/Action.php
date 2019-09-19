@@ -51,6 +51,8 @@ class Action {
     
     function setId(?string $id){
         $this->id = $id;
+        
+        return $this;
     }
     
     function getType(){
@@ -59,6 +61,8 @@ class Action {
     
     function setType(?string $type){
         $this->type = $type ? strtolower($type) : 'button';
+        
+        return $this;
     }
     
     function getClass(){
@@ -67,6 +71,8 @@ class Action {
     
     function setClass(?string $class){
         $this->class = $class;
+        
+        return $this;
     }
     
     function getText(){
@@ -75,6 +81,8 @@ class Action {
     
     function setText(?string $text){
         $this->text = $text;
+        
+        return $this;
     }
     
     function getIcon(){
@@ -83,6 +91,8 @@ class Action {
     
     function setIcon(?string $icon){
         $this->icon = $icon;
+        
+        return $this;
     }
     
     function getPath(){
@@ -91,6 +101,8 @@ class Action {
     
     function setPath($path=null){
         $this->path = $path;
+        
+        return $this;
     }
     
     function getParams(): array{
@@ -99,6 +111,8 @@ class Action {
     
     function setParams($params=[]){
         $this->params = $params;
+        
+        return $this;
     }
     
     function getTarget(){
@@ -107,6 +121,8 @@ class Action {
     
     function setTarget($target=null){
         $this->target = $target;
+        
+        return $this;
     }
     
     function getClick(){
@@ -115,5 +131,7 @@ class Action {
     
     function setClick($click=null){
         $this->click = $click;
+        
+        return $this;
     }
 }

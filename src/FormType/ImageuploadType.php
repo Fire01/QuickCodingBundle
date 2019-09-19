@@ -3,20 +3,21 @@ namespace Fire01\QuickCodingBundle\FormType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
-class TexteditorType extends AbstractType
-{
+class ImageuploadType extends AbstractType
+{   
     public function configureOptions(OptionsResolver $resolver)
     {       
         $resolver->setDefaults([
-            'attr' => ['class' => 'tinymce-texteditor'],
+            'data_class' => null,
+            'attr' => ['class' => 'input-image-upload']
         ]);
     }
     
     public function getParent()
     {
-        return TextareaType::class;
+        return FileType::class;
     }
 }
 

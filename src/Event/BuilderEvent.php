@@ -7,22 +7,22 @@ use Symfony\Component\EventDispatcher\Event;
 class BuilderEvent extends Event
 {
     private $entity;
-    private $request;
+    private $form;
 
-    public function __construct($request, $entity)
+    public function __construct($form, $entity)
     {
+        $this->setForm($form);
         $this->setEntity($entity);
-        $this->setRequest($request);
     }
     
-    public function getRequest()
+    public function getForm()
     {
-        return $this->request;
+        return $this->form;
     }
     
-    public function setRequest($request)
+    public function setForm($form)
     {
-        $this->request = $request;
+        $this->form = $form;
     }
     
     public function getEntity()

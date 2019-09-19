@@ -296,3 +296,23 @@ table#view thead tr th {
 .tox .tox-edit-area {
     border-top: 1px solid #e5e5e5 !important;
 }
+
+.container-image-upload {
+    border: 1px dashed #e5e5e5;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.container-image-upload img{
+	height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+.widget-image-upload .uk-form-custom, 
+.widget-image-upload .uk-form-custom input,
+.widget-image-upload .uk-form-custom button{
+	width:202px;
+}

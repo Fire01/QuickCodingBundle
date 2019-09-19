@@ -10,12 +10,17 @@
         <service id="Fire01\QuickCodingBundle\Builder" alias="quick_coding.builder" />
         <!-- End Builder Service -->
     	
-    	
     	<!-- Maker Service -->
 		<service id="Fire01\QuickCodingBundle\Command\MakeController" autoconfigure="true">
 		    <argument type="service" id="maker.doctrine_helper" />
 		</service>
 		<!-- End Maker Service -->
+		
+		<!-- 
+		<service id="Fire01\QuickCodingBundle\FormType\FileuploadType" autoconfigure="true">
+            <argument key="$uploadDirectory">%upload_directory%</argument>
+        </service>
+        -->
     </services>
     
 </container>
