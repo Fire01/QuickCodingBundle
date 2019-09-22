@@ -343,11 +343,13 @@
 	{%- set type = type|default('file') -%}
     <div class="widget-image-upload">
     	<div class="container-image-upload">
-    		<img src="{{ asset(form.vars.data ? form.vars.data : quick_coding.public ~ 'images/default-image.png') }}" onerror="this.src='{{ asset(quick_coding.public ~ 'images/default-image.png') }}'">
+    		<img src="{{ asset(form.vars.data ? asset(form.vars.path) ~ '/' ~ form.vars.data : quick_coding.public ~ 'images/default-image.png') }}" onerror="this.src='{{ asset(quick_coding.public ~ 'images/default-image.png') }}'">
     	</div>
+    	{%- if not form.parent.vars.disabled -%}
     	<div uk-form-custom>
             {{- block('form_widget_simple') -}}
             <button class="uk-button uk-button-default uk-button-small" type="button" tabindex="-1"> <span uk-icon="icon: upload"></span> Select Image</button>
     	</div>
+    	{%- endif -%}
     </div>
 {% endblock %}
