@@ -12,7 +12,7 @@ class ImagineWrapper {
         $this->filterManager = $filterManager;
     }
     
-    function upload($image, $filter, $path, $fileName=null) : void
+    function upload($image, $filter, $path, $fileName=null)
     {
         $fileName = $fileName ? $fileName : md5(microtime(true)) . md5(uniqid(rand(), true)) . "." . $image->guessExtension();
         $binary = new Binary(file_get_contents($image), $image->getMimeType(), $image->guessExtension());
@@ -22,5 +22,7 @@ class ImagineWrapper {
         $f = fopen($path . '/' . $fileName, 'w');
         fwrite($f, $content);
         fclose($f);         
+        
+        return $fileName;
     }
 }
