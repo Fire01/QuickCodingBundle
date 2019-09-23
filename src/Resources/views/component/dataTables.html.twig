@@ -27,8 +27,11 @@ $(document).ready(function(){
             	if(Array.isArray(data)){
                 	return (data.map(v => `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>`)).join('');
                 }
-                
-                return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            	if (typeof data === 'string' || data instanceof String){
+                	return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                }
+
+                return data;
             }},
             {% endfor %}
         	{data: "remove", width:110, orderable:false, defaultContent: `
