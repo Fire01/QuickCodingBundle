@@ -4,7 +4,7 @@
     	{%- set blocks = [] -%}
     	{%- for item in form -%}{%- set blocks = blocks|merge([item.vars.block_prefixes[(item.vars.block_prefixes|length) - 2]]) -%}{%- endfor -%}
         
-        {% if 'choice' in blocks %}
+        {% if 'choice' in blocks or 'entity' in blocks %}
         	<link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/selectize/css/selectize.css') }}" />
         	<!--[if IE 8]><script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/es5.js') }}"></script><![endif]-->
         	<script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/jquery-ui_sortable.min.js') }}"></script>
@@ -19,6 +19,10 @@
     	
     	{% if 'richtext' in blocks %}
         	<script src="{{ asset(quick_coding.public ~ 'plugins/tinymce/tinymce.min.js') }}"></script>
+    	{% endif %}
+    	
+    	{% if 'google_autocomplete' in blocks %}
+        	<script src="https://maps.googleapis.com/maps/api/js?key={{ form.vars.google_maps_key }}&libraries=places"></script>
     	{% endif %}
     	
     	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-form-horizontal')|trim }) -%}
@@ -58,7 +62,7 @@
         {%- set blocks = [] -%}
     	{%- for item in form -%}{%- set blocks = blocks|merge([item.vars.block_prefixes[(item.vars.block_prefixes|length) - 2]]) -%}{%- endfor -%}
         
-        {% if 'choice' in blocks %}
+        {% if 'choice' in blocks or 'entity' in blocks %}
     	    <script>$('select').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
     	{% endif %}
     	
@@ -353,3 +357,34 @@
     	{%- endif -%}
     </div>
 {% endblock %}
+
+{# =========================================================== Google Autocomplete Widget ===========================================================#}
+{%- block google_autocomplete_widget -%}
+	{%- if not form.parent.vars.disabled -%}
+    	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-input')|trim }) -%}
+        {%- set type = type|default('text') -%}
+        {%- if type == 'range' or type == 'color' -%}
+            {%- set required = false -%}
+        {%- endif -%}
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        <script>
+        	var options = {};
+        	{%- if form.vars.country -%}
+            options.componentRestrictions = {country: "{{ form.vars.country }}"};
+            {%- endif -%}
+            console.log(options);
+			$(document).ready(function(){
+				var autocomplete_{{ form.vars.id }} = new google.maps.places.Autocomplete(document.getElementById('{{ form.vars.id }}'), options);
+				autocomplete_{{ form.vars.id }}.addListener('place_changed', function(){
+					var place = autocomplete_{{ form.vars.id }}.getPlace();
+					document.getElementById('{{ form.parent.vars.id ~ '_' ~ form.vars.lat }}').value = place.geometry.location.lat();
+					document.getElementById('{{ form.parent.vars.id ~ '_' ~ form.vars.lng }}').value = place.geometry.location.lng();
+				});	
+			})
+        </script>
+    {%- else -%}
+    	{%- if form.vars.name != "_token" -%}
+    		<p class="uk-textarea">{{ value }}</p>
+    	{%- endif -%}
+    {%- endif -%}
+{%- endblock google_autocomplete_widget -%}
