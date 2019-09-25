@@ -23,6 +23,7 @@ class GoogleAutocompleteType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {       
         $resolver->setDefaults([
+            'required' => false,
             'attr' => ['class' => 'google-autocomplete'],
             'country' => null,
             'lat' => null,

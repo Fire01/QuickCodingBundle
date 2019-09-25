@@ -23,6 +23,7 @@ class ImageuploadType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'required' => false,
             'attr'          => ['class' => 'input-image-upload'],
             'public_dir'    => $this->public_dir,
             'data_class'    => null,

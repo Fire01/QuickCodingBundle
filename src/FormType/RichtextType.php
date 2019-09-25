@@ -10,6 +10,7 @@ class RichtextType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {       
         $resolver->setDefaults([
+            'required' => false,
             'attr' => ['class' => 'tinymce-texteditor'],
         ]);
     }

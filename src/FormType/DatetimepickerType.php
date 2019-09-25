@@ -10,6 +10,7 @@ class DatetimepickerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {       
         $resolver->setDefaults([
+            'required' => false,
             'attr' => ['class' => 'flatpickr-datetimepicker'],
             'widget'=>'single_text',
             'format' => 'yyyy-MM-dd HH:mm',

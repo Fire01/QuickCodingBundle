@@ -10,8 +10,9 @@ class DatepickerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {       
         $resolver->setDefaults([
+            'required' => false,
             'attr' => ['class' => 'flatpickr-datepicker'],
-            'widget'=>'single_text'
+            'widget'=>'single_text',
         ]);
     }
     

@@ -225,7 +225,8 @@
         {%- endif -%}
         <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     {%- else -%}
-    	{%- if form.vars.name != "_token" -%}
+    	{% set blockName = form.vars.block_prefixes[(form.vars.block_prefixes|length) - 2] %}
+    	{%- if blockName != "hidden" and blockName != "csrf_token" -%}
     		<p class="uk-textarea">{{ value }}</p>
     	{%- endif -%}
     {%- endif -%}
@@ -372,7 +373,6 @@
         	{%- if form.vars.country -%}
             options.componentRestrictions = {country: "{{ form.vars.country }}"};
             {%- endif -%}
-            console.log(options);
 			$(document).ready(function(){
 				var autocomplete_{{ form.vars.id }} = new google.maps.places.Autocomplete(document.getElementById('{{ form.vars.id }}'), options);
 				autocomplete_{{ form.vars.id }}.addListener('place_changed', function(){
