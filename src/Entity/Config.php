@@ -11,6 +11,7 @@ class Config {
     protected $path = ['view' => null, 'form' => null, 'remove' => null];
     protected $action;
     protected $actionbar = [];
+    protected $template = ['view' => null, 'form' => null];
     
     function __construct(array $config=[]){
         $this->set($config);
@@ -22,6 +23,7 @@ class Config {
         $this->setForm(isset($config['form']) && $config['form'] ? $config['form'] : null);
         $this->setColumn(isset($config['column']) && $config['column'] ? $config['column'] : []);
         $this->setViewType(isset($config['viewType']) && $config['viewType'] ? $config['viewType'] : null);
+        $this->setTemplate(isset($config['template']) && $config['template'] ? $config['template'] : null);
         
         $this->setPath(isset($config['path']) && $config['path'] ? $config['path'] : null);
         $this->setAction(isset($config['action']) && $config['action'] ? $config['action'] : null);
@@ -190,6 +192,37 @@ class Config {
         $action->setIcon('close');
         
         $this->addActionbar($action);
+        
+        return $this;
+    }
+    
+    function getTemplate(): array{
+        return $this->template;
+    }
+    
+    function setTemplate($template=null){
+        $this->setTemplateView(is_array($template) ? (isset($template['view']) ? $template['view'] : null) : $template);
+        $this->setTemplateForm(is_array($template) ? (isset($template['form']) ? $template['form'] : null) : $template);
+        
+        return $this;
+    }
+    
+    function getTemplateView(){
+        return $this->template['view'];
+    }
+    
+    function setTemplateView($template){
+        $this->template['view'] = $template ? $template : ($this->getViewType() == 'DataTables' ? '@quick_coding.view/component/dataTables.html.twig' : '@quick_coding.view/component/view.html.twig');
+        
+        return $this;
+    }
+    
+    function getTemplateForm(){
+        return $this->template['form'];
+    }
+    
+    function setTemplateForm($template){
+        $this->template['form'] = $template ? $template : '@quick_coding.view/component/form.html.twig';
         
         return $this;
     }

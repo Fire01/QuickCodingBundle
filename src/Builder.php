@@ -8,7 +8,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Fire01\QuickCodingBundle\Entity\Config;
 use Fire01\QuickCodingBundle\Entity\Action;
 use Fire01\QuickCodingBundle\Services\Validator;
-use Fire01\QuickCodingBundle\Event\BuilderEvent;
+use Fire01\QuickCodingBundle\Event\BuilderFormEvent;
+use Fire01\QuickCodingBundle\Event\BuilderRemoveEvent;
+use Fire01\QuickCodingBundle\Event\BuilderViewEvent;
 
 class Builder extends AbstractController {
      
@@ -93,6 +95,13 @@ class Builder extends AbstractController {
         
         $item = $id ? $repository->find($id) : new $entity();
         $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
+        
+        $event = new BuilderFormEvent($item, $form);
+        
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch('quick_coding.builder_form_before_submit', $event);
+        }
+        
         $form->handleRequest($request);
         
         $this->config->addActionbarFormClose();
@@ -111,7 +120,7 @@ class Builder extends AbstractController {
         
         if($form->isSubmitted() && $form->isValid()) {
 
-            $event = new BuilderEvent($form, $item);
+            $event = new BuilderFormEvent($item, $form);
             
             if ($this->eventDispatcher) {
                 $this->eventDispatcher->dispatch('quick_coding.builder_form_before_save', $event);
@@ -124,7 +133,7 @@ class Builder extends AbstractController {
             return $this->redirectToRoute($this->config->getPathView());
         }
         
-        return $this->render("@quick_coding.view/component/form.html.twig", ["config" => $this->config, "form" => $form->createView()]);
+        return $this->render($this->config->getTemplateForm(), ["config" => $this->config, "form" => $form->createView()]);
     }
     
     function removeData($id){
@@ -134,6 +143,13 @@ class Builder extends AbstractController {
         $item = $this->getDoctrine()->getRepository($this->config->getEntity())->find($id);
         $em = $this->getDoctrine()->getManager();
         $em->remove($item);
+        
+        $event = new BuilderRemoveEvent($item, $em);
+        
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch('quick_coding.builder_remove_after', $event);
+        }
+        
         $em->flush();
         
         if($isAjax){
@@ -180,7 +196,7 @@ class Builder extends AbstractController {
                 'error'             => null
             ]);
         }
-        return $this->render('@quick_coding.view/component/dataTables.html.twig', ['config' => $this->config]);
+        return $this->render($this->config->getTemplateView(), ['config' => $this->config]);
     }
     
     /* @TODO: Move to new class, like repository or something*/
@@ -192,9 +208,15 @@ class Builder extends AbstractController {
         
         if($search){
             foreach($this->config->getColumn() as $column){
-                $data->orWhere('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter( $column['name'], '%' . $search . '%');
-                $total->orWhere('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter( $column['name'], '%' . $search . '%');
+                $data->where('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter( $column['name'], $search);
+                $total->where('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter( $column['name'], $search);
             }
+        }
+        
+        $event = new BuilderViewEvent($data, $total);
+        
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch('quick_coding.builder_view_where', $event);
         }
         
         $total = $total->getQuery()->getSingleScalarResult();
