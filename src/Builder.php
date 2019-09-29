@@ -206,10 +206,13 @@ class Builder extends AbstractController {
         $data = $repository->createQueryBuilder('t');
         $total = $repository->createQueryBuilder('t')->select('count(t.id)');
         
+        $columnToSearched = $this->config->getColumn();
+        array_shift($columnToSearched);
+        
         if($search){
             foreach($this->config->getColumn() as $column){
-                $data->where('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter( $column['name'], $search);
-                $total->where('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter( $column['name'], $search);
+                $data->orWhere('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter($column['name'], $search . '%');
+                $total->orWhere('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter($column['name'], $search . '%');
             }
         }
         
