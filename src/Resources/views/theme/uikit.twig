@@ -67,15 +67,15 @@
     	{% endif %}
     	
     	{% if 'datepicker' in blocks %}
-    	    <script>$(".flatpickr-datepicker").flatpickr();</script>
+    	    <script>$(".flatpickr-datepicker").flatpickr({allowInput:true});</script>
     	{% endif %}	
     	
     	{% if 'timepicker' in blocks %}
-    	    <script>$(".flatpickr-timepicker").flatpickr({enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr:true});</script>
+    	    <script>$(".flatpickr-timepicker").flatpickr({enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr:true, allowInput:true});</script>
     	{% endif %}
     	
     	{% if 'datetimepicker' in blocks %}
-    	    <script>$(".flatpickr-datetimepicker").flatpickr({enableTime: true, time_24hr:true});</script>
+    	    <script>$(".flatpickr-datetimepicker").flatpickr({enableTime: true, time_24hr:true, allowInput:true});</script>
     	{% endif %}
     	
     	{% if 'richtext' in blocks %}
@@ -238,7 +238,7 @@
     	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-textarea')|trim }) -%}
         <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 	{%- else -%}
-    	<p class="uk-textarea">{{ value }}</p>
+    	<div class="uk-textarea">{{ (value|default('&nbsp'))|raw }}</div>
     {%- endif -%}
 {%- endblock textarea_widget -%}
 

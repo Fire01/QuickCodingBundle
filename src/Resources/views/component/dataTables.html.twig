@@ -23,13 +23,29 @@ $(document).ready(function(){
         },
         columns: [
         	{% for item in config.column %}
-        	{data: "{{ item.name }}", defaultContent: '-', render: function ( data, type, row ) {
+        	{data: "{{ item.name }}", defaultContent: '-', {{ item.disableOrder is defined and item.disableOrder ? 'orderable: false, ' : '' }} render: function ( data, type, row ) {
             	if(Array.isArray(data)){
                 	return (data.map(v => `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>`)).join('');
                 }
+                
             	if (typeof data === 'string' || data instanceof String){
                 	return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
                 }
+                
+	        {% if item.type is defined %}
+
+                {% if item.type == 'date' or item.type == 'time' or item.type == 'datetime' %}
+                if(data && data.timestamp){
+                    var date = new Date(data.timestamp * 1000);
+                    
+                    {% if item.type == 'date' %}return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });{% endif %}
+                    {% if item.type == 'time'%}return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });{% endif %}
+                    {% if item.type == 'datetime' %}return date.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });{% endif %}
+                    
+                }
+                {% endif %}
+                
+	        {% endif %}
 
                 return data;
             }},
