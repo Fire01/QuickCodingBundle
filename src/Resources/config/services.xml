@@ -31,6 +31,10 @@ Liip\ImagineBundle\Imagine\Filter\FilterManager:
 		 	<argument key="$public_dir">%kernel.project_dir%/public/</argument>
         </service>
         
+        <service id="Fire01\QuickCodingBundle\FormType\FileuploadType" autoconfigure="true">
+		 	<argument key="$public_dir">%kernel.project_dir%/public/</argument>
+        </service>
+        
         <service id="Fire01\QuickCodingBundle\FormType\CurrentuserType" autoconfigure="true">
 		 	<argument type="service" id="security.helper" />
         </service>

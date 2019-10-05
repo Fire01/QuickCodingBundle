@@ -330,18 +330,16 @@
 {%- endblock radio_widget -%}
 
 {# =========================================================== File Widget ===========================================================#}
-{#
+
 {% block file_widget -%}
 	{%- set type = type|default('file') -%}
-    <div class="uk-upload">
-    	<div class="uk-upload-input" uk-form-custom>
+    <div class="uk-margin" uk-margin>
+        <div uk-form-custom="target: true" class="uk-width-1-1">
             {{- block('form_widget_simple') -}}
-            <button class="uk-button uk-border-rounded uk-button-default" type="button" tabindex="-1"> <span uk-icon="icon: upload"></span> Select File</button>
-    	</div>
-    	<div class="uk-upload-target"></div>
+            <input class="uk-input uk-input" type="text" placeholder="Select file" disabled>
+        </div>
     </div>
 {% endblock %}
-#}
 
 {# =========================================================== Imageupload Widget ===========================================================#}
 {% block imageupload_widget -%}
