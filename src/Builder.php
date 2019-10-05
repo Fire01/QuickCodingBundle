@@ -184,7 +184,7 @@ class Builder extends AbstractController {
         if(isset($query['type']) && $query['type'] == 'json'){
             
             $serializer = new Serializer([new ObjectNormalizer()]);
-            $column = array_map(function($item) {return $item['name'];}, $this->config->getColumn());
+            $column = array_map(function($item) {return isset($item['get']) && $item['get'] ? $item['get'] : $item['name'];}, $this->config->getColumn());
             array_unshift($column,'id');
             
             $DataTablesJSON = $this->getDataDataTables($query['order'], $query['length'], $query['start'], $query['search']['value']);
@@ -206,13 +206,24 @@ class Builder extends AbstractController {
         $data = $repository->createQueryBuilder('t');
         $total = $repository->createQueryBuilder('t')->select('count(t.id)');
         
-        $columnToSearched = $this->config->getColumn();
-        array_shift($columnToSearched);
+        foreach($this->config->getColumn() as $column){
+            if(isset($column['leftJoin']) && $column['leftJoin']){
+                $relation = 't.' . $column['leftJoin'][0];
+                $alias = isset($column['leftJoin'][1]) && $column['leftJoin'][1] ? $column['leftJoin'][1] : $column['leftJoin'][0];
+                
+                $data->leftJoin($relation, $alias);
+                $total->leftJoin($relation, $alias);
+            }
+        }
         
         if($search){
             foreach($this->config->getColumn() as $column){
-                $data->orWhere('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter($column['name'], $search . '%');
-                $total->orWhere('t.' . $column['name'] . ' LIKE :' . $column['name'])->setParameter($column['name'], $search . '%');
+                $columnName = isset($column['leftJoin']) && $column['leftJoin'] ? (isset($column['leftJoin'][1]) && $column['leftJoin'][1] ? $column['leftJoin'][1] : $column['leftJoin'][0]) . "." : 't.';
+                $columnName .= isset($column['search']) && $column['search'] ? $column['search'] : $column['name'];
+                $searchCondition = $columnName . ' LIKE :' . $column['name'];
+                
+                $data->orWhere($searchCondition)->setParameter($column['name'], '%' . $search . '%');
+                $total->orWhere($searchCondition)->setParameter($column['name'], '%' . $search . '%');
             }
         }
         

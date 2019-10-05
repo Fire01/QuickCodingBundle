@@ -188,6 +188,15 @@ p.uk-textarea {
     margin-right: 20px;
 }
 
+.login-container{
+	max-width: 450px;
+    margin: auto;
+}
+
+.login-container .uk-card-body{
+	padding: 20px 40px;	
+}
+
 #__ajaxLoading .uk-modal-dialog{
 	width: 200px;
     text-align: center;
@@ -299,8 +308,8 @@ table#view thead tr th {
 
 .container-image-upload {
     border: 1px dashed #e5e5e5;
-    width: 200px;
-    height: 200px;
+    max-width: 200px;
+    max-height: 200px;
     margin-bottom: 5px;
     text-align: center;
 }
@@ -308,6 +317,8 @@ table#view thead tr th {
 .container-image-upload img{
 	height: 100%;
     width: 100%;
+    max-width: 200px;
+    max-height: 200px;
     object-fit: contain;
 }
 

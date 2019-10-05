@@ -1,4 +1,5 @@
 TODO
 ============
-- Autosize imageupload img with filter if set
-- Change width login form
+- Add Role support on Builder
+- Query Builder View Order by Relation Column
+- Test Remove relation from entity not from event

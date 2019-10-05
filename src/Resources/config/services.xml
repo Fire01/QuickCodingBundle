@@ -2,16 +2,10 @@
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 	
     <services>
-    	<!-- 
-Liip\ImagineBundle\Imagine\Filter\FilterManager:
-      alias: 'liip_imagine.filter.manager'
-    	 -->
+    	
     	<!-- Builder Service -->
-        <service id="quick_coding.builder" class="Fire01\QuickCodingBundle\Builder" autowire="true" autoconfigure="true">
-        </service>
-
-        <service id="Fire01\QuickCodingBundle\Builder" alias="quick_coding.builder" />
-        <!-- End Builder Service -->
+        <service id="Fire01\QuickCodingBundle\Builder" autowire="true" autoconfigure="true"></service>
+		<!-- End Builder Service -->
         
         <!-- Imagine Wrapper Service -->
         <service id="quick_coding.imagine_wrapper" class="Fire01\QuickCodingBundle\Services\ImagineWrapper">
@@ -27,12 +21,12 @@ Liip\ImagineBundle\Imagine\Filter\FilterManager:
 		</service>
 		<!-- End Maker Service -->
 		
-		<service id="Fire01\QuickCodingBundle\FormType\ImageuploadType" autoconfigure="true">
+        <service id="Fire01\QuickCodingBundle\FormType\FileuploadType" autoconfigure="true">
 		 	<argument key="$public_dir">%kernel.project_dir%/public/</argument>
         </service>
         
-        <service id="Fire01\QuickCodingBundle\FormType\FileuploadType" autoconfigure="true">
-		 	<argument key="$public_dir">%kernel.project_dir%/public/</argument>
+        <service id="Fire01\QuickCodingBundle\FormType\ImageuploadType" autoconfigure="true">
+        	<argument type="service" id="quick_coding.imagine_wrapper" />
         </service>
         
         <service id="Fire01\QuickCodingBundle\FormType\CurrentuserType" autoconfigure="true">

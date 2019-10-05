@@ -23,9 +23,9 @@ $(document).ready(function(){
         },
         columns: [
         	{% for item in config.column %}
-        	{data: "{{ item.name }}", defaultContent: '-', {{ item.disableOrder is defined and item.disableOrder ? 'orderable: false, ' : '' }} render: function ( data, type, row ) {
+        	{data: "{{ item.get is defined and item.get ? item.get : item.name }}", defaultContent: '-', {{ item.disableOrder is defined and item.disableOrder ? 'orderable: false, ' : '' }} render: function ( data, type, row ) {
             	if(Array.isArray(data)){
-                	return (data.map(v => `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>`)).join('');
+                	return (data.map(v => v ? `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>` : '')).join('');
                 }
                 
             	if (typeof data === 'string' || data instanceof String){
