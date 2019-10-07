@@ -1,6 +1,8 @@
 <?php 
 namespace Fire01\QuickCodingBundle\Entity;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
 class Config {
 
     protected $title;
@@ -12,6 +14,7 @@ class Config {
     protected $action;
     protected $actionbar = [];
     protected $template = ['view' => null, 'form' => null];
+    protected $roles = ['create' => null, 'read' => null, 'update' => null, 'delete' => null];
     
     function __construct(array $config=[]){
         $this->set($config);
@@ -27,6 +30,8 @@ class Config {
         
         $this->setPath(isset($config['path']) && $config['path'] ? $config['path'] : null);
         $this->setAction(isset($config['action']) && $config['action'] ? $config['action'] : null);
+        
+        $this->setRoles(isset($config['roles']) && $config['roles'] ? $config['roles'] : []);
     }
     
     function all(){
@@ -34,11 +39,13 @@ class Config {
             'title'     => $this->getTitle(),
             'entity'    => $this->getEntity(),
             'form'      => $this->getForm(),
-            'viewType'  => $this->getViewType(),
             'column'    => $this->getColumn(),
+            'viewType'  => $this->getViewType(),
+            'template'  => $this->getTemplate(),
             'path'      => $this->getPath(),
             'action'    => $this->getAction(),
             'actionbar' => $this->getActionbar(),
+            'roles'     => $this->getRoles()
         ];
     }
     
@@ -227,8 +234,79 @@ class Config {
         return $this;
     }
     
+    function getRoles(): array{
+        return $this->roles;
+    }
+    
+    function setRoles($roles){
+        $roleCreate = $roles;
+        $roleRead = $roles;
+        $roleUpdate = $roles;
+        $roleDelete = $roles;
+        
+        if(is_array($roles)){
+            if(isset(array_keys($roles)[0]) && array_keys($roles)[0]){
+                $roleCreate = [];
+                $roleRead   = [];
+                $roleUpdate = [];
+                $roleDelete = [];
+            }
+            
+            if(isset($roles['create']))     $roleCreate     = $roles['create'];
+            if(isset($roles['read']))       $roleRead       = $roles['read'];
+            if(isset($roles['update']))     $roleUpdate     = $roles['update'];
+            if(isset($roles['delete']))     $roleDelete     = $roles['delete'];
+        }
+        
+        $this->setRolesCreate($roleCreate);
+        $this->setRolesRead($roleRead);
+        $this->setRolesUpdate($roleUpdate);
+        $this->setRolesDelete($roleDelete);
+        
+        return $this;
+    }
+    
+    function getRolesCreate(){
+        return $this->roles['create'];
+    }
+    
+    function setRolesCreate($roles){
+        $this->roles['create'] = $roles;
+        
+        return $this;
+    }
+    
+    function getRolesRead(){
+        return $this->roles['read'];
+    }
+    
+    function setRolesRead($roles){
+        $this->roles['read'] = $roles;
+        
+        return $this;
+    }
+    
+    function getRolesUpdate(){
+        return $this->roles['update'];
+    }
+    
+    function setRolesUpdate($roles){
+        $this->roles['update'] = $roles;
+        
+        return $this;
+    }
+    
+    function getRolesDelete(){
+        return $this->roles['delete'];
+    }
+    
+    function setRolesDelete($roles){
+        $this->roles['delete'] = $roles;
+        
+        return $this;
+    }
+    
     function readable($string){
         return ucfirst(preg_replace(['/(?<=[^A-Z])([A-Z])/', '/(?<=[^0-9])([0-9])/'], ' $0', $string));
     }
-   
 }

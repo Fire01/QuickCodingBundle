@@ -33,21 +33,31 @@ class Builder extends AbstractController {
         $this->config->setPath($request->attributes->get('_route'));
         $action = strtolower($request->attributes->get('_route_params')['action']);
         $id = $request->attributes->get('id');
-       
+        
         switch($action){
             case 'create':
+                if(count($this->config->getRolesCreate())) $this->denyAccessUnlessGranted($this->config->getRolesCreate());
+                
                 return $this->generateForm();
                 break;
             case 'read':
+                if(count($this->config->getRolesRead())) $this->denyAccessUnlessGranted($this->config->getRolesRead());
+                
                 return $this->generateForm($id, false);
                 break;
             case 'update':
+                if(count($this->config->getRolesUpdate())) $this->denyAccessUnlessGranted($this->config->getRolesUpdate());
+                
                 return $this->generateForm($id, true);
                 break;
             case 'delete':
+                if(count($this->config->getRolesDelete())) $this->denyAccessUnlessGranted($this->config->getRolesDelete());
+                
                 return $this->removeData($id);
                 break;
         }
+        
+        if(count($this->config->getRolesRead())) $this->denyAccessUnlessGranted($this->config->getRolesRead());
         
         return $this->generateView();
     }
