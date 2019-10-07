@@ -227,7 +227,8 @@ table#view thead tr th {
 .qc-btn-action{
 	width: 30px;
     height: 30px;
-    padding: 0px;	
+    padding: 0px;
+    margin-right: 5px;
 }
 
 .selectize-dropdown, .selectize-input, .selectize-input input {

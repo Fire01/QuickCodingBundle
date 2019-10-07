@@ -54,12 +54,16 @@ $(document).ready(function(){
             	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
             		<span uk-icon="icon: file-text"></span>
             	</button>
+            	{%- if (config.ACL.update|length) == 0 or is_granted(config.ACL.update) -%}
             	<button type="button" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
         			<span uk-icon="icon: file-edit"></span>
         		</button>
+        		{%- endif -%}
+        		{%- if (config.ACL.delete|length) == 0 or is_granted(config.ACL.delete) -%}
         		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
         			<span uk-icon="icon: minus-circle"></span>
         		</button>
+        		{%- endif -%}
             `},
         ],
         initComplete : function() {

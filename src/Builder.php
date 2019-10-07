@@ -36,53 +36,54 @@ class Builder extends AbstractController {
         
         switch($action){
             case 'create':
-                if(count($this->config->getRolesCreate())) $this->denyAccessUnlessGranted($this->config->getRolesCreate());
+                if(count($this->config->getACL()->getCreate())) $this->denyAccessUnlessGranted($this->config->getACL()->getCreate());
                 
                 return $this->generateForm();
                 break;
             case 'read':
-                if(count($this->config->getRolesRead())) $this->denyAccessUnlessGranted($this->config->getRolesRead());
+                if(count($this->config->getACL()->getRead())) $this->denyAccessUnlessGranted($this->config->getACL()->getRead());
                 
                 return $this->generateForm($id, false);
                 break;
             case 'update':
-                if(count($this->config->getRolesUpdate())) $this->denyAccessUnlessGranted($this->config->getRolesUpdate());
+                if(count($this->config->getACL()->getUpdate())) $this->denyAccessUnlessGranted($this->config->getACL()->getUpdate());
                 
                 return $this->generateForm($id, true);
                 break;
             case 'delete':
-                if(count($this->config->getRolesDelete())) $this->denyAccessUnlessGranted($this->config->getRolesDelete());
+                if(count($this->config->getACL()->getDelete())) $this->denyAccessUnlessGranted($this->config->getACL()->getDelete());
                 
                 return $this->removeData($id);
                 break;
         }
         
-        if(count($this->config->getRolesRead())) $this->denyAccessUnlessGranted($this->config->getRolesRead());
+        if(count($this->config->getACL()->getRead())) $this->denyAccessUnlessGranted($this->config->getACL()->getRead());
         
         return $this->generateView();
     }
     
     function generateView($pathNew=null){
         Validator::view($this->config);
+       
+        $this->config->addActionbar(new Action([
+            'type' => 'link',
+            'class' => 'uk-button-danger',
+            'text' => 'Close',
+            'icon' => 'close',
+            'path' => $this->getParameter('quick_coding.app_home'),
+            'target' => 'route'
+        ]));
         
-        $this->config
-            ->addActionbar(new Action([
-                'type' => 'link',
-                'class' => 'uk-button-danger',
-                'text' => 'Close',
-                'icon' => 'close',
-                'path' => $this->getParameter('quick_coding.app_home'),
-                'target' => 'route'
-            ]))
-            ->addActionbar(new Action([
+        if($this->config->getACL()->canCreate($this->getUser()->getRoles())){
+            $this->config->addActionbar(new Action([
                 'type' => 'link',
                 'text' => 'Create ' . $this->config->getTitle(),
                 'icon' => 'plus-circle',
                 'path' => $this->config->getPathForm(),
                 'params' => ['action' => 'create'],
                 'target' => 'route'
-            ]))
-        ;
+            ]));
+        }
         
         switch ($this->config->getViewType()){
             case 'Native':
@@ -118,14 +119,16 @@ class Builder extends AbstractController {
         if($edit){
             $this->config->addActionbarFormSave();
         }else{
-            $this->config->addActionbar(new Action([
-                'type' => 'link', 
-                'text' => 'Edit', 
-                'icon' => 'pencil',
-                'path' => $this->config->getPathForm(),
-                'params' => ['action' => 'update', 'id' => $item->getId()],
-                'target' => 'route'
-            ]));
+            if($this->config->getACL()->canUpdate($this->getUser()->getRoles())){
+                $this->config->addActionbar(new Action([
+                    'type' => 'link',
+                    'text' => 'Edit',
+                    'icon' => 'pencil',
+                    'path' => $this->config->getPathForm(),
+                    'params' => ['action' => 'update', 'id' => $item->getId()],
+                    'target' => 'route'
+                ]));
+            }
         }
         
         if($form->isSubmitted() && $form->isValid()) {
