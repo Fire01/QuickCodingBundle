@@ -24,6 +24,8 @@ class Builder extends AbstractController {
     
     function setConfig(array $config){
         $this->config->set($config);
+        
+        return $this;
     }
 
     function build(){

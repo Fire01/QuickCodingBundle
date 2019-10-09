@@ -24,8 +24,7 @@ class <?= $class_name; ?> extends <?= $parent_class_name; ?><?= "\n" ?>
      * @Route("/qc<?= $route_path ?>/{action}/{id}", requirements={"id"="\d+"}, name="quick_coding_<?= $route_name ?>", methods="GET|POST")
      */
     public function qc_generator(Builder $builder, $action=null, $id=null){
-        $builder->setConfig(array_merge($this->config, ['action' => $action]));
-        return $builder->build();
+        return $builder->setConfig(array_merge($this->config, ['action' => $action]))->build();
     }
     
 }

@@ -30,6 +30,8 @@ class Config {
         $this->setAction(isset($config['action']) && $config['action'] ? $config['action'] : null);
         
         $this->setACL(new ACL(isset($config['ACL']) ? $config['ACL'] : []));
+        
+        return $this;
     }
     
     function all(){
