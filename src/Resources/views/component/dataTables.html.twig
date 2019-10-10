@@ -18,7 +18,7 @@ $(document).ready(function(){
         pageLength: 25,
         orderMulti: true,
         ajax: {
-            url: "{{ path(config.path.view) }}",
+            url: "{{ config.path.view is iterable ? path(config.path.view[0], config.path.view[1]) : path(config.path.view) }}",
             data: function(params) {params.type = "json";delete params.columns}
         },
         columns: [

@@ -22,6 +22,10 @@ class Builder extends AbstractController {
         $this->eventDispatcher = $eventDispatcher;
     }
     
+    function getConfig(){
+        return $this->config;
+    }
+    
     function setConfig(array $config){
         $this->config->set($config);
         
@@ -64,7 +68,7 @@ class Builder extends AbstractController {
         return $this->generateView();
     }
     
-    function generateView($pathNew=null){
+    function generateView($pathNew=null, $params=null){
         Validator::view($this->config);
        
         $this->config->addActionbar(new Action([
@@ -81,8 +85,8 @@ class Builder extends AbstractController {
                 'type' => 'link',
                 'text' => 'Create ' . $this->config->getTitle(),
                 'icon' => 'plus-circle',
-                'path' => $this->config->getPathForm(),
-                'params' => ['action' => 'create'],
+                'path' => $pathNew ? $pathNew : $this->config->getPathForm(),
+                'params' => $params ? array_merge($params, ['action' => 'create']) : ['action' => 'create'],
                 'target' => 'route'
             ]));
         }
