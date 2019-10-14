@@ -17,7 +17,6 @@ class QuickCodingExtension extends Extension implements PrependExtensionInterfac
         $config = $this->processConfiguration(new Configuration(), $configs);
         
         $container->setParameter('quick_coding.app_name', $config[ 'app_name']);
-        $container->setParameter('quick_coding.app_logo', $config[ 'app_logo']);
         $container->setParameter('quick_coding.app_home', $config[ 'app_home']);
     }
     
@@ -33,6 +32,7 @@ class QuickCodingExtension extends Extension implements PrependExtensionInterfac
         $twigConfig['globals']['quick_coding']['app_name'] = $config['app_name'];
         $twigConfig['globals']['quick_coding']['app_logo'] = $config['app_logo'];
         $twigConfig['globals']['quick_coding']['app_home'] = $config['app_home'];
+        //$twigConfig['globals']['quick_coding']['layout_stylesheets'] = $config['layout_stylesheets'];
         
         $container->prependExtensionConfig('twig', $twigConfig);
     }
