@@ -8,7 +8,9 @@
 		<!-- End Builder Service -->
 		
 		<!-- Rest Service -->
-        <service id="Fire01\QuickCodingBundle\Rest" autowire="true" autoconfigure="true"></service>
+        <service id="Fire01\QuickCodingBundle\Rest" autowire="true" autoconfigure="true">
+        	<argument type="service" id="doctrine" />
+        </service>
 		<!-- End Rest Service -->
         
         <!-- Imagine Wrapper Service -->

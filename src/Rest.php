@@ -1,12 +1,16 @@
 <?php 
 namespace Fire01\QuickCodingBundle;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Fire01\QuickCodingBundle\Entity\View;
 
-class Rest extends AbstractController{
+class Rest {
     
     protected $view;
+    protected $doctrine;
+    
+    function __construct($doctrine){
+        $this->doctrine = $doctrine;
+    }
     
     function set($config)
     {
@@ -22,7 +26,7 @@ class Rest extends AbstractController{
      
     function generate()
     {
-        $repository = $this->getDoctrine()->getRepository($this->view->getEntity());
+        $repository = $this->doctrine->getRepository($this->view->getEntity());
         
         $data = $repository->createQueryBuilder('t');
         if(count($this->view->getSelect())){
