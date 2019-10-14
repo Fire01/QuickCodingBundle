@@ -2,33 +2,26 @@
 namespace Fire01\QuickCodingBundle;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Fire01\QuickCodingBundle\Entity\View;
 
 class Rest extends AbstractController{
     
-    protected $entity;
-    protected $page = 1;
-    protected $length = 25;
-    protected $orders = [];
-    protected $search;
-    protected $q;
-    protected $join;
-    protected $total=false;
+    protected $view;
     
-    function set($config){
-        $this->entity = $config['entity'];
-        
-        if(isset($config['orders']))    $this->orders = $config['orders'];
-        if(isset($config['page']))      $this->page = $config['page'];
-        if(isset($config['length']))   $this->length = $config['length'];
-        if(isset($config['search']))    $this->search = $config['search'];
-        if(isset($config['q']))    $this->q = $config['q'];
-        if(isset($config['join']))      $this->search = $config['join'];
-        if(isset($config['total']))      $this->total = $config['total'];
+    function set($config)
+    {
+        $this->view = new View($config);
         
         return $this;
     }
+    
+    function getConfig() :View
+    {
+        return $this->view;
+    }
      
-    function generate(){
+    function generate()
+    {
         $repository = $this->getDoctrine()->getRepository($this->entity);
         
         $data = $repository->createQueryBuilder('t');

@@ -1,4 +1,5 @@
 <?php 
+
 namespace Fire01\QuickCodingBundle\Entity;
 
 class Config {
