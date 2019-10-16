@@ -28,45 +28,57 @@ class Rest {
     {
         $repository = $this->doctrine->getRepository($this->view->getEntity());
         
-        $data = $repository->createQueryBuilder('t');
+        $data = $repository->createQueryBuilder($this->view->getAlias());
         if(count($this->view->getSelect())){
-            $select = array_map(function($select){return strpos($select, ".") !== false ? $select : "t." . $select;},$this->view->getSelect());
-            $data->select(implode(", ", $select));
+            $data->select(implode(", ", $this->view->getSelect()));
         }
         
-        if($this->view->getTotal())    $total = $repository->createQueryBuilder('t')->select('count(t.id)');
+        if($this->view->getTotal())    $total = $repository->createQueryBuilder($this->view->getAlias())->select("count(" . $this->view->getAlias() . ".id)");
         else $total = 0;
         
         foreach($this->view->getJoin() as $column => $alias){
-            $data->leftJoin("t." . $column, $alias);
-            if($total)  $total->leftJoin("t." . $column, $alias);
+            $data->leftJoin($this->view->getAlias() . "." . $column, $alias);
+            if($total)  $total->leftJoin($this->view->getAlias() . "." . $column, $alias);
+        }
+        
+        $counter = 0;
+        if(count($this->view->getConditions())){
+            foreach($this->view->getConditions() as $condition){
+                $param = "param_" . $counter;
+                $value = $condition[2];
+                $condition[2] = ":" . $param;
+                $connector = isset($condition[3]) ? $condition[3] : 'and';
+                if(isset($condition[3]))    array_pop($condition);
+                
+                $conditions = implode(" ", $condition);
+                
+                if(strtolower($connector) == 'or'){
+                    $data->orWhere($conditions)->setParameter($param, $value);
+                    if($total)  $total->orWhere(implode(" ", $condition))->setParameter($param, $value);
+                }else{
+                    $data->andWhere($conditions)->setParameter($param, $value);
+                    if($total)  $total->andWhere(implode(" ", $condition))->setParameter($param, $value);
+                }
+                
+                $counter++;
+            }
         }
         
         if(count($this->view->getSearch()) && $this->view->getQ()){
-            $counter = 0;
-            foreach($this->view->getSearch() as $column){
-                if(strpos($column, ".") !== false){
-                    $relation = explode(".", $column);
-                    $searchCondition = $relation[0] . "." . $relation[1] . " LIKE :param_" . $counter;
-                    $param = "param_" . $counter;
-                    $counter++;
-                }else{
-                    $searchCondition = "t." . $column . " LIKE :" . $column;
-                    $param = $column;
-                }
-                
-                $data->orWhere($searchCondition)->setParameter($param, "%" . $this->view->getQ() . "%");
-                if($total)  $total->orWhere($searchCondition)->setParameter($param, "%" . $this->view->getQ() . "%");
-            }
+            $param = "param_" . $counter;
+            $searchCondition = implode(" LIKE :" . $param . " OR ", $this->view->getSearch()) . " LIKE :" . $param;
+            $data->andWhere($searchCondition)->setParameter($param, "%" . $this->view->getQ() . "%");
+            if($total)  $total->andWhere($searchCondition)->setParameter($param, "%" . $this->view->getQ() . "%");
+            
+            $counter++;
         }
         
         if($total)    $total = $total->getQuery()->getSingleScalarResult();
         
         foreach($this->view->getOrders() as $key => $order){
-            $key = strpos($key, ".") !== false ? $key : "t." . $key;
             $data->addOrderBy($key, $order);
         }
-
+        
         $data = $data->setMaxResults($this->view->getLength())->setFirstResult($this->view->getFirstResult())->getQuery()->getResult();
         
         return $total ? ['total' => $total, 'data' => $data] : $data;
