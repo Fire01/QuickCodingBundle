@@ -40,7 +40,7 @@
         	</div>
         	<div class="uk-card-body">
 	{%- if not form.vars.disabled -%}
-                <form{% if name != '' %} name="form_{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+                <form{% if name != '' %} name="{{ name }}" id="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
                 {%- if form_method != method -%}
                     <input type="hidden" name="_method" value="{{ method }}" />
                 {%- endif -%}
@@ -83,6 +83,11 @@
     	    tinymce.init({
     		    selector: '.tinymce-texteditor', menubar: false, plugins : 'lists', height: 300,
     		    toolbar: ['formatselect | bold italic underline strikethrough | subscript superscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent'],
+    		    setup: function (editor) {
+    		        editor.on('change', function (e) {
+    		            editor.save();
+    		        });
+    		    }
     	    })
     	    </script>
     	{% endif %}

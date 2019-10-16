@@ -14,6 +14,9 @@ html, body{
     background-color: #32d296 !important
 }
 
+.uk-modal-page { overflow: visible !important; }
+.uk-modal-page > body { overflow-y: visible !important;overflow-x: hidden !important; }
+
 .dropdown-user {
     padding: 5px 20px;
 }
