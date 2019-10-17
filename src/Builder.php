@@ -16,11 +16,11 @@ class Builder extends AbstractController {
      
     private $eventDispatcher;
     private $config;
-    private $rest;
+    private $query;
     
-    function __construct(array $config=[], Rest $rest, EventDispatcherInterface $eventDispatcher){
+    function __construct(array $config=[], Query $query, EventDispatcherInterface $eventDispatcher){
         $this->config = new Config();
-        $this->rest = $rest;
+        $this->query = $query;
         $this->eventDispatcher = $eventDispatcher;
     }
     
@@ -214,7 +214,7 @@ class Builder extends AbstractController {
                 ->setTotal(true)
             ;
 
-            $DataTablesJSON = $this->rest->set($this->config->getView())->generate();
+            $DataTablesJSON = $this->query->set($this->config->getView())->generate();
             
             return $this->json([
                 'draw'              => $query['draw'],

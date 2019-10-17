@@ -7,11 +7,11 @@
         <service id="Fire01\QuickCodingBundle\Builder" autowire="true" autoconfigure="true"></service>
 		<!-- End Builder Service -->
 		
-		<!-- Rest Service -->
-        <service id="Fire01\QuickCodingBundle\Rest" autowire="true" autoconfigure="true">
+		<!-- Rest Query -->
+        <service id="Fire01\QuickCodingBundle\Query" autowire="true" autoconfigure="true">
         	<argument type="service" id="doctrine" />
         </service>
-		<!-- End Rest Service -->
+		<!-- End Query Service -->
         
         <!-- Imagine Wrapper Service -->
         <service id="quick_coding.imagine_wrapper" class="Fire01\QuickCodingBundle\Services\ImagineWrapper">

@@ -3,7 +3,7 @@ namespace Fire01\QuickCodingBundle;
 
 use Fire01\QuickCodingBundle\Entity\View;
 
-class Rest {
+class Query {
     
     protected $view;
     protected $doctrine;
@@ -88,4 +88,11 @@ class Rest {
         return $this->view->getTotal() ? ['total' => $total, 'data' => $data] : $data;
     }
     
+    function raw($sql){
+        $em = $this->doctrine->getManager();
+        $conn = $em->getConnection();
+        $query = $conn->prepare($sql);
+        $query->execute();
+        return $query->fetchAll();
+    }
 }
