@@ -23,13 +23,14 @@ $(document).ready(function(){
         },
         columns: [
         	{% for item in config.view.select %}
-        	{data: "{{ item }}", defaultContent: '-', render: function ( data, type, row ) {
+        	{data: "{{ item | replace({' ': ""}) }}", defaultContent: '-', render: function ( data, type, row ) {
             	if(Array.isArray(data)){
                 	return (data.map(v => v ? `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>` : '')).join('');
                 }
 
                 var d = new Date(data);
-                if(d instanceof Date && !isNaN(d)){
+                if(d instanceof Date && !isNaN(d) && d.getTime() != data){
+                    
                 	return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
                 	//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
                 	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });

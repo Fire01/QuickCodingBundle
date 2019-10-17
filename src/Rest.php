@@ -32,11 +32,11 @@ class Rest {
         if(count($this->view->getSelect())){
             $selects = [];
             foreach($this->view->getSelect() as $key => $select){
-                $selects[] = $key . " as " . $select;
+                $selects[] = $key . " as " . str_replace(" ", "", $select);
             }
             $data->select(implode(", ", $selects));
         }
-        
+
         if($this->view->getTotal())    $total = $repository->createQueryBuilder($this->view->getAlias())->select("count(" . $this->view->getAlias() . ".id)");
         else $total = 0;
         
