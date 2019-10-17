@@ -17,8 +17,11 @@ class View
     protected $alias = "t";
     protected $join = [];
     
-    function __construct($config){
-        
+    function __construct($config=[]){
+        $this->set($config);
+    }
+    
+    function set($config){
         if(isset($config['entity']))    $this->setEntity($config['entity']);
         if(isset($config['select']))    $this->setSelect($config['select']);
         if(isset($config['conditions']))$this->setConditions($config['conditions']);
@@ -52,9 +55,17 @@ class View
         return $this->transformToAlias($this->select);
     }
     
+    function addSelect(array $select): self
+    {
+        $select = array_flip($select);
+        $key = array_keys($select)[0];
+        $this->select[$key] = $select[$key];
+        return $this;
+    }
+    
     function setSelect(array $select): self
     {
-        $this->select = $select;
+        $this->select = array_flip($select);
         
         return $this;
     }
@@ -85,7 +96,12 @@ class View
 
     function getSearch(): ?array
     {
-        return count($this->search) ? $this->transformToAlias($this->search) : $this->transformToAlias($this->select);
+        $search = count($this->search) ? $this->search : array_keys($this->select);
+        if (($key = array_search("id", $search)) !== false) {
+            unset($search[$key]);
+        }
+        
+        return $this->transformToAlias($search);
     }
 
     function setSearch(?array $search): self
@@ -162,7 +178,7 @@ class View
     
     function setJoin(){
         $counter = 0;
-        $columns = array_merge($this->select, array_keys($this->orders), $this->search);
+        $columns = array_merge(array_keys($this->select), array_keys($this->orders), $this->search);
         foreach($columns as $column){
             if(strpos($column, ".") !== false){
                 $relation = explode(".", $column);
@@ -175,11 +191,14 @@ class View
     }
     
     function getFirstResult(){
-        return ($this->getPage() - 1) * $this->getLength();
+        $start = ($this->getPage() - 1) * $this->getLength();
+        
+        return $start;
     }
     
     function transformToAlias(array $data){
         $result = [];
+        
         foreach($data as $key => $column){
             $type = is_array($column) ? 3 : (is_numeric($key) ? 1 : 2);
             
@@ -201,7 +220,11 @@ class View
     }
     
     function getRelationAlias($string){
-        $arr = explode(".", $string);
-        return isset($this->join[$arr[0]]) ? $this->join[$arr[0]] . "." . $arr[1] : $this->getAlias() . "." . $string;
+        if(strpos($string, ".") !== false){
+            $arr = explode(".", $string);
+            return (isset($this->join[$arr[0]]) ? $this->join[$arr[0]] : $arr[0]) . "." . $arr[1];
+        }
+        
+        return $this->getAlias() . "." . $string;
     }
 }

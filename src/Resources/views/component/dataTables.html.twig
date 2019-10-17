@@ -22,31 +22,23 @@ $(document).ready(function(){
             data: function(params) {params.type = "json";delete params.columns}
         },
         columns: [
-        	{% for item in config.column %}
-        	{data: "{{ item.get is defined and item.get ? item.get : item.name }}", defaultContent: '-', {{ item.disableOrder is defined and item.disableOrder ? 'orderable: false, ' : '' }} render: function ( data, type, row ) {
+        	{% for item in config.view.select %}
+        	{data: "{{ item }}", defaultContent: '-', render: function ( data, type, row ) {
             	if(Array.isArray(data)){
                 	return (data.map(v => v ? `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>` : '')).join('');
                 }
-                
-            	if (typeof data === 'string' || data instanceof String){
+
+                var d = new Date(data);
+                if(d instanceof Date && !isNaN(d)){
+                	return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
+                	//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
+                	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });
+                }
+
+                if (typeof data === 'string' || data instanceof String){
                 	return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
                 }
-                
-	        {% if item.type is defined %}
-
-                {% if item.type == 'date' or item.type == 'time' or item.type == 'datetime' %}
-                if(data && data.timestamp){
-                    var date = new Date(data.timestamp * 1000);
-                    
-                    {% if item.type == 'date' %}return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });{% endif %}
-                    {% if item.type == 'time'%}return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });{% endif %}
-                    {% if item.type == 'datetime' %}return date.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });{% endif %}
-                    
-                }
-                {% endif %}
-                
-	        {% endif %}
-
+    	        
                 return data;
             }},
             {% endfor %}
@@ -126,8 +118,8 @@ $(document).ready(function(){
 		<table id="view" class="uk-table uk-table-hover uk-table-striped" style="width:100%">
             <thead>
                 <tr>
-                    {% for item in config.column %}
-                    <th>{{ item.title }}</th>
+                    {% for item in config.view.select %}
+                    <th>{{ item }}</th>
                     {% endfor %}
                     <th></th>
                 </tr>

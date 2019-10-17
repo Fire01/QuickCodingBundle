@@ -14,7 +14,7 @@ class Rest {
     
     function set($config)
     {
-        $this->view = new View($config);
+        $this->view = is_array($config) ? new View($config) : $config;
         
         return $this;
     }
@@ -27,10 +27,14 @@ class Rest {
     function generate()
     {
         $repository = $this->doctrine->getRepository($this->view->getEntity());
-        
         $data = $repository->createQueryBuilder($this->view->getAlias());
+        
         if(count($this->view->getSelect())){
-            $data->select(implode(", ", $this->view->getSelect()));
+            $selects = [];
+            foreach($this->view->getSelect() as $key => $select){
+                $selects[] = $key . " as " . $select;
+            }
+            $data->select(implode(", ", $selects));
         }
         
         if($this->view->getTotal())    $total = $repository->createQueryBuilder($this->view->getAlias())->select("count(" . $this->view->getAlias() . ".id)");
@@ -72,7 +76,7 @@ class Rest {
             
             $counter++;
         }
-        
+
         if($total)    $total = $total->getQuery()->getSingleScalarResult();
         
         foreach($this->view->getOrders() as $key => $order){
@@ -81,7 +85,7 @@ class Rest {
         
         $data = $data->setMaxResults($this->view->getLength())->setFirstResult($this->view->getFirstResult())->getQuery()->getResult();
         
-        return $total ? ['total' => $total, 'data' => $data] : $data;
+        return $this->view->getTotal() ? ['total' => $total, 'data' => $data] : $data;
     }
     
 }

@@ -8,12 +8,12 @@ class Config {
     protected $entity;
     protected $form;
     protected $viewType;
-    protected $column;
+    protected $view = null;
     protected $path = ['view' => null, 'form' => null, 'remove' => null];
     protected $action;
     protected $actionbar = [];
     protected $template = ['view' => null, 'form' => null];
-    protected $ACL;
+    protected $ACL = null;
     
     function __construct(array $config=[]){
         $this->set($config);
@@ -23,14 +23,14 @@ class Config {
         $this->setTitle(isset($config['title']) && $config['title'] ? $config['title'] : null);
         $this->setEntity(isset($config['entity']) && $config['entity'] ? $config['entity'] : null);
         $this->setForm(isset($config['form']) && $config['form'] ? $config['form'] : null);
-        $this->setColumn(isset($config['column']) && $config['column'] ? $config['column'] : []);
         $this->setViewType(isset($config['viewType']) && $config['viewType'] ? $config['viewType'] : null);
         $this->setTemplate(isset($config['template']) && $config['template'] ? $config['template'] : null);
         
         $this->setPath(isset($config['path']) && $config['path'] ? $config['path'] : null);
         $this->setAction(isset($config['action']) && $config['action'] ? $config['action'] : null);
         
-        $this->setACL(new ACL(isset($config['ACL']) ? $config['ACL'] : []));
+        $this->setView(new View(isset($config['view']) ? $config['view'] : null));
+        $this->setACL(new ACL(isset($config['ACL']) ? $config['ACL'] : null));
         
         return $this;
     }
@@ -91,12 +91,12 @@ class Config {
         return $this;
     }
     
-    function getColumn(): array{
-        return $this->column ? $this->column : [];
+    function getView(): View{
+        return $this->view ? $this->view : null;
     }
     
-    function setColumn(?array $column){
-        $this->column = $column;
+    function setView(?View $view){
+        $this->view = $view;
         
         return $this;
     }

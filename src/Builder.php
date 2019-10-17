@@ -16,9 +16,11 @@ class Builder extends AbstractController {
      
     private $eventDispatcher;
     private $config;
+    private $rest;
     
-    function __construct(array $config=[], EventDispatcherInterface $eventDispatcher){
+    function __construct(array $config=[], Rest $rest, EventDispatcherInterface $eventDispatcher){
         $this->config = new Config();
+        $this->rest = $rest;
         $this->eventDispatcher = $eventDispatcher;
     }
     
@@ -183,18 +185,8 @@ class Builder extends AbstractController {
     }
     
     function generateViewNative(){
-        /*
-        $request = $this->get('request_stack')->getCurrentRequest();
-        
-        if($request->query->get('order')){
-            $order = explode('-', $request->query->get('order'));
-        }else{
-            $order = count($this->config->getColumn()) ? [$this->config->getColumn()[0]['name'], 'Asc'] : [];
-        }
-        
-        $data =  $this->data($entityID, $order, $request->query->getInt('page', 1), $perPage, $request->query->get('search'));
-        return $this->render('@quick_coding.view/component/view.html.twig', ['title' => $title, 'column' => $view, 'path' => $request->attributes->get('_route'), 'order' => $order, 'data' => $data]);
-        */
+        throw new \Exception("@TODO");
+        return;
     }
     
     function generateViewDataTables(){
@@ -202,64 +194,36 @@ class Builder extends AbstractController {
         $query = $request->query->all();
         if(isset($query['type']) && $query['type'] == 'json'){
             
-            $serializer = new Serializer([new ObjectNormalizer()]);
-            $column = array_map(function($item) {return isset($item['get']) && $item['get'] ? $item['get'] : $item['name'];}, $this->config->getColumn());
-            array_unshift($column,'id');
+            $page = $query['start'] / $query['length'];
+            $page = $page < 0 ? 1 : $page + 1;
+            $orders = [];
+            $selects = array_flip($this->config->getView()->getSelect());
+            $selectsKeys = array_keys($selects);
+            foreach($query['order'] as $order){
+                $key = $selects[$selectsKeys[$order['column']]];
+                $orders[$key] = $order['dir'];
+            }
             
-            $DataTablesJSON = $this->getDataDataTables($query['order'], $query['length'], $query['start'], $query['search']['value']);
+            $this->config->getView()
+                ->setEntity($this->config->getEntity())
+                ->addSelect(['id' => 'id'])
+                ->setOrders($orders)
+                ->setQ($query['search']['value'])
+                ->setLength($query['length'])
+                ->setPage($page)
+                ->setTotal(true)
+            ;
+
+            $DataTablesJSON = $this->rest->set($this->config->getView())->generate();
+            
             return $this->json([
                 'draw'              => $query['draw'],
                 'recordsTotal'      => $DataTablesJSON['total'],
                 'recordsFiltered'   => $DataTablesJSON['total'],
-                'data'              => $serializer->normalize($DataTablesJSON['data'], null, ['attributes' => $column]),
+                'data'              => $DataTablesJSON['data'],
                 'error'             => null
             ]);
         }
         return $this->render($this->config->getTemplateView(), ['config' => $this->config]);
-    }
-    
-    /* @TODO: Move to new class, like repository or something*/
-    function getDataDataTables($orders, $length, $start, $search){
-        $repository = $this->getDoctrine()->getRepository($this->config->getEntity());
-        
-        $data = $repository->createQueryBuilder('t');
-        $total = $repository->createQueryBuilder('t')->select('count(t.id)');
-        
-        foreach($this->config->getColumn() as $column){
-            if(isset($column['leftJoin']) && $column['leftJoin']){
-                $relation = 't.' . $column['leftJoin'][0];
-                $alias = isset($column['leftJoin'][1]) && $column['leftJoin'][1] ? $column['leftJoin'][1] : $column['leftJoin'][0];
-                
-                $data->leftJoin($relation, $alias);
-                $total->leftJoin($relation, $alias);
-            }
-        }
-        
-        if($search){
-            foreach($this->config->getColumn() as $column){
-                $columnName = isset($column['leftJoin']) && $column['leftJoin'] ? (isset($column['leftJoin'][1]) && $column['leftJoin'][1] ? $column['leftJoin'][1] : $column['leftJoin'][0]) . "." : 't.';
-                $columnName .= isset($column['search']) && $column['search'] ? $column['search'] : $column['name'];
-                $searchCondition = $columnName . ' LIKE :' . $column['name'];
-                
-                $data->orWhere($searchCondition)->setParameter($column['name'], '%' . $search . '%');
-                $total->orWhere($searchCondition)->setParameter($column['name'], '%' . $search . '%');
-            }
-        }
-        
-        $event = new BuilderViewEvent($data, $total);
-        
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch('quick_coding.builder_view_where', $event);
-        }
-        
-        $total = $total->getQuery()->getSingleScalarResult();
-        
-        foreach($orders as $order){
-            $data->orderBy('t.' . $this->config->getColumn()[$order['column']]['name'], $order['dir']);
-        }
-        
-        $data = $data->setMaxResults($length)->setFirstResult($start)->getQuery()->getResult();
-        
-        return ['total' => $total, 'data' => $data];
     }
 }
