@@ -68,10 +68,9 @@ $(document).ready(function(){
     		</button>
     		{%- endif -%}
 	`});
-	
 	var delID = null;
 	var table = $("#view").DataTable({
-		order: [orders],
+		order: [orders.length ? orders : [0, 'Asc']],
         processing: true,
         serverSide: true,
         pageLength: 25,
