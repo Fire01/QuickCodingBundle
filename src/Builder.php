@@ -11,6 +11,9 @@ use Fire01\QuickCodingBundle\Services\Validator;
 use Fire01\QuickCodingBundle\Event\BuilderFormEvent;
 use Fire01\QuickCodingBundle\Event\BuilderRemoveEvent;
 use Fire01\QuickCodingBundle\Event\BuilderViewEvent;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Builder extends AbstractController {
      
@@ -63,6 +66,9 @@ class Builder extends AbstractController {
                 
                 return $this->removeData($id);
                 break;
+            case 'export':
+                return $this->export();
+                break;
         }
         
         if(count($this->config->getACL()->getRead())) $this->denyAccessUnlessGranted($this->config->getACL()->getRead());
@@ -92,6 +98,16 @@ class Builder extends AbstractController {
                 'target' => 'route'
             ]));
         }
+        
+        
+        $this->config->addActionbar(new Action([
+            'type' => 'link',
+            'text' => 'Export ' . $this->config->getTitle(),
+            'icon' => 'plus-circle',
+            'path' => $pathNew ? $pathNew : $this->config->getPathForm(),
+            'params' => $params ? array_merge($params, ['action' => 'create']) : ['action' => 'create'],
+            'target' => 'route'
+        ]));
         
         switch ($this->config->getViewType()){
             case 'Native':
@@ -225,5 +241,23 @@ class Builder extends AbstractController {
             ]);
         }
         return $this->render($this->config->getTemplateView(), ['config' => $this->config]);
+    }
+    
+    function export()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue("B2", "OKE");
+        $writer = new Xlsx($spreadsheet);
+        
+        $response =  new StreamedResponse(
+            function () use ($writer) {
+                $writer->save('php://output');
+            }
+        );
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment;filename="' . $this->getConfig()->getTitle() . '.xlsx"');
+        $response->headers->set('Cache-Control','max-age=0');
+        return $response;
     }
 }
