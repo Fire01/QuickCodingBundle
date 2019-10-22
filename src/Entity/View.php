@@ -137,7 +137,7 @@ class View
     
     function getPage(): ?int
     {
-        return $this->page;
+        return $this->page > 0 ? $this->page : 1;
     }
     
     function setPage(?int $page): self

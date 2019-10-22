@@ -11,8 +11,66 @@
 <script src="{{ asset(quick_coding.public ~ "plugins/datatables/dataTables.uikit.min.js") }}"></script>
 <script>
 $(document).ready(function(){
+	{% set select = [] %}
+	{% set orders = [] %}
+	{% set columns = [] %}
+	{% for key, name in config.view.select|keys %}
+	    {% set select = select|merge({(name): key}) %}
+	    {% set columns = columns|merge([(config.view.select[name]|replace({' ': ""}))]) %}
+	{% endfor %}
+	{% for key, order in config.view.orders %}
+	    {% set orders = select[key] is defined ? orders|merge([(select[key]), order]) : orders %}
+	{% endfor %}
+	var orders = {{ orders|json_encode|raw }};
+	var columns = {{ columns|json_encode|raw }};
+
+	columns = columns.map(el => {
+		return {
+			data: el, 
+			defaultContent: '-', 
+			render: function ( data, type, row ) {
+	        	if(Array.isArray(data)){
+	            	return (data.map(v => v ? `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>` : '')).join('');
+	            }
+
+	            var d = new Date(data);
+	            if(d instanceof Date && !isNaN(d) && d.getTime() != data){
+	            	return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
+	            	//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
+	            	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });
+	            }
+
+	            if (typeof data === 'string' || data instanceof String){
+	            	return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
+	            }
+		        
+	            return data;
+	        }
+        };
+	});
+
+	columns.push({
+		data: "quick_coding_actions", 
+		width:110, 
+		orderable:false, 
+		defaultContent: `
+        	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
+        		<span uk-icon="icon: file-text"></span>
+        	</button>
+        	{%- if (config.ACL.update|length) == 0 or is_granted(config.ACL.update) -%}
+        	<button type="button" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
+    			<span uk-icon="icon: file-edit"></span>
+    		</button>
+    		{%- endif -%}
+    		{%- if (config.ACL.delete|length) == 0 or is_granted(config.ACL.delete) -%}
+    		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
+    			<span uk-icon="icon: minus-circle"></span>
+    		</button>
+    		{%- endif -%}
+	`});
 	var delID = null;
 	var table = $("#view").DataTable({
+		order: [orders.length ? orders : [0, 'Asc']],
         processing: true,
         serverSide: true,
         pageLength: 25,
@@ -21,44 +79,7 @@ $(document).ready(function(){
             url: "{{ config.path.view is iterable ? path(config.path.view[0], config.path.view[1]) : path(config.path.view) }}",
             data: function(params) {params.type = "json";delete params.columns}
         },
-        columns: [
-        	{% for item in config.view.select %}
-        	{data: "{{ item | replace({' ': ""}) }}", defaultContent: '-', render: function ( data, type, row ) {
-            	if(Array.isArray(data)){
-                	return (data.map(v => v ? `<span class="uk-label uk-label-success uk-border-rounded item-datatables">${v}</span>` : '')).join('');
-                }
-
-                var d = new Date(data);
-                if(d instanceof Date && !isNaN(d) && d.getTime() != data){
-                    
-                	return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
-                	//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
-                	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });
-                }
-
-                if (typeof data === 'string' || data instanceof String){
-                	return data.replace(/(?:\r\n|\r|\n)/g, '<br>');
-                }
-    	        
-                return data;
-            }},
-            {% endfor %}
-        	{data: "remove", width:110, orderable:false, defaultContent: `
-            	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
-            		<span uk-icon="icon: file-text"></span>
-            	</button>
-            	{%- if (config.ACL.update|length) == 0 or is_granted(config.ACL.update) -%}
-            	<button type="button" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
-        			<span uk-icon="icon: file-edit"></span>
-        		</button>
-        		{%- endif -%}
-        		{%- if (config.ACL.delete|length) == 0 or is_granted(config.ACL.delete) -%}
-        		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
-        			<span uk-icon="icon: minus-circle"></span>
-        		</button>
-        		{%- endif -%}
-            `},
-        ],
+        columns: columns,
         initComplete : function() {
             var input = $('.dataTables_filter input').unbind();
             var self = this.api();
@@ -107,7 +128,7 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block actionbar %}
-{% include '@quick_coding.view/component/actionbar.twig' with {actionbar: config.actionbar} %}
+    {% include '@quick_coding.view/component/actionbar.twig' with {actionbar: config.actionbar} %}
 {% endblock %}
 
 {% block body %}
