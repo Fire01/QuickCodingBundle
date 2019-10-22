@@ -288,7 +288,7 @@
 {%- block choice_widget_collapsed -%}
 	{%- if not form.parent.vars.disabled -%}
     	{%- if placeholder is none -%}
-            {% set placeholder = 'Select ' ~ form.vars.name %}
+            {% set placeholder = 'Select ' ~ form.vars.label %}
         {%- endif -%}
         {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
             {% set required = false %}
