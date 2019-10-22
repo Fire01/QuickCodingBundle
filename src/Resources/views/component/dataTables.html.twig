@@ -34,10 +34,13 @@ $(document).ready(function(){
 	            }
 
 	            var d = new Date(data);
-	            if(d instanceof Date && !isNaN(d) && d.getTime() != data){
-	            	return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
-	            	//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
-	            	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });
+	            if(data && d instanceof Date && !isNaN(d) && d.getTime() != data){
+		            var isT = data.substr(10,1) == "T";
+					if(isT){
+						return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
+						//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
+		            	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });
+					}
 	            }
 
 	            if (typeof data === 'string' || data instanceof String){
