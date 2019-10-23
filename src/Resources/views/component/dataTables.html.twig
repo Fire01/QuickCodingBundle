@@ -98,7 +98,7 @@ $(document).ready(function(){
             $('.dataTables_filter').append($searchButton);
         }
     });
-
+	
 	$("#qc-table-datatables tbody").on( "click", "td .qc-view", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		var path = "{{ path(config.path.form, {action: 'read', id: '0000'}) }}";
@@ -127,6 +127,14 @@ $(document).ready(function(){
 	})
 	
 });
+
+function getParamExport(){
+	var dt = $("#qc-table-datatables").DataTable();
+	var params = dt.ajax.params().order.map((el, i) => `order[${i}][column]=${el.column}&order[${i}][dir]=${el.dir}`);
+	params.push("search[value]=" + dt.ajax.params().search.value);
+	 
+	return params.join("&");
+}
 </script>
 {% endblock %}
 

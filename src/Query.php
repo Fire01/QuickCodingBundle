@@ -83,7 +83,12 @@ class Query {
             $data->addOrderBy($key, $order);
         }
         
-        $data = $data->setMaxResults($this->view->getLength())->setFirstResult($this->view->getFirstResult())->getQuery()->getResult();
+        if($this->view->getLength() == 0){
+            $data = $data->getQuery()->getResult();
+        }else{
+            $data = $data->setMaxResults($this->view->getLength())->setFirstResult($this->view->getFirstResult())->getQuery()->getResult();
+        }
+        
         
         return $this->view->getTotal() ? ['total' => $total, 'data' => $data] : $data;
     }

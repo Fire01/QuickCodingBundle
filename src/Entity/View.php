@@ -12,6 +12,7 @@ class View
     protected $search = [];
     protected $q;
     protected $total=false;
+    protected $export=false;
     protected $page = 1;
     protected $length = 25;
     protected $alias = "t";
@@ -31,6 +32,7 @@ class View
         if(isset($config['search']))    $this->setSearch($config['search']);
         if(isset($config['q']))         $this->setQ($config['q']);
         if(isset($config['total']))     $this->setTotal($config['total']);
+        if(isset($config['export']))     $this->setExport($config['export']);
         if(isset($config['alias']))     $this->setAlias($config['alias']);
         
         $this->setJoin();
@@ -132,6 +134,23 @@ class View
     {
         $this->total = $total;
 
+        return $this;
+    }
+    
+    function getExport()
+    {
+        return is_bool($this->export) ? $this->getSelect() : $this->export;
+    }
+    
+    function hasExport(): bool
+    {
+        return (is_array($this->export) && count($this->export)) || $this->export ? true : false;
+    }
+    
+    function setExport($export): self
+    {
+        $this->export = $export;
+        
         return $this;
     }
     

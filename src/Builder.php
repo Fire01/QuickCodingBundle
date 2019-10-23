@@ -14,6 +14,7 @@ use Fire01\QuickCodingBundle\Event\BuilderViewEvent;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class Builder extends AbstractController {
      
@@ -90,7 +91,7 @@ class Builder extends AbstractController {
         
         if($this->config->getACL()->canCreate($this->getUser()->getRoles())){
             $this->config->addActionbar(new Action([
-                'type' => 'link',
+                'type' => 'js',
                 'text' => 'Create ' . $this->config->getTitle(),
                 'icon' => 'plus-circle',
                 'path' => $pathNew ? $pathNew : $this->config->getPathForm(),
@@ -99,15 +100,14 @@ class Builder extends AbstractController {
             ]));
         }
         
-        
-        $this->config->addActionbar(new Action([
-            'type' => 'link',
-            'text' => 'Export ' . $this->config->getTitle(),
-            'icon' => 'plus-circle',
-            'path' => $pathNew ? $pathNew : $this->config->getPathForm(),
-            'params' => $params ? array_merge($params, ['action' => 'create']) : ['action' => 'create'],
-            'target' => 'route'
-        ]));
+        if($this->config->getView()->hasExport()){
+            $this->config->addActionbar(new Action([
+                'type' => 'button',
+                'text' => 'Export',
+                'icon' => 'download',
+                'click' => "document.location = document.URL + '/export?' + encodeURI(getParamExport())"
+            ]));
+        }
         
         switch ($this->config->getViewType()){
             case 'Native':
@@ -245,19 +245,41 @@ class Builder extends AbstractController {
     
     function export()
     {
+        $request = $this->get('request_stack')->getCurrentRequest();
+        $query = $request->query->all();
+        
+        $orders = [];
+        $this->config->getView()->setSelect($this->config->getView()->getExport());
+        $selects = array_flip($this->config->getView()->getSelect());
+        $selectsKeys = array_keys($selects);
+        foreach($query['order'] as $order){
+            $key = $selects[$selectsKeys[$order['column']]];
+            $orders[$key] = $order['dir'];
+        }
+        
+        $this->config->getView()
+            ->setEntity($this->config->getEntity())
+            ->setOrders($orders)
+            ->setQ($query['search']['value'])
+            ->setLength(0)
+        ;
+       
+        $items = $this->query->set($this->config->getView())->generate();
+        
+        $array = [$selectsKeys];
+        $array = array_merge($array, $items);
+        
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue("B2", "OKE");
+        
+        $sheet = $spreadsheet->getActiveSheet()->fromArray($array, null, 'A1');
+        
+        $sheet->setTitle($this->config->getTitle());
         $writer = new Xlsx($spreadsheet);
         
-        $response =  new StreamedResponse(
-            function () use ($writer) {
-                $writer->save('php://output');
-            }
-        );
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment;filename="' . $this->getConfig()->getTitle() . '.xlsx"');
-        $response->headers->set('Cache-Control','max-age=0');
-        return $response;
+        $fileName = $this->config->getTitle() . ' - ' . date("Ymdhi"). '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($temp_file);
+        
+        return $this->file($temp_file, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 }
