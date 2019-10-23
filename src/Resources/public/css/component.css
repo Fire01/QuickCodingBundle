@@ -178,7 +178,7 @@ p.uk-textarea {
 #action-bar{
     width: 100% !important;
     z-index: 99;
-    padding: 15px 25px;
+    padding: 10px 20px 5px 20px;
     background: #fff;
     border-bottom: 2px solid #ccc;
 }
@@ -188,7 +188,8 @@ p.uk-textarea {
 }
 
 #action-bar .uk-button {
-    margin-right: 20px;
+    margin-right: 15px;
+    margin-bottom: 5px;
 }
 
 .login-container{
@@ -212,14 +213,18 @@ p.uk-textarea {
     background-color: #32d296;
 }
 
-table#view {
+table#qc-table-datatables {
     margin-top: 20px;
 }
 
-table#view thead tr th {
+table#qc-table-datatables thead tr th {
     background: #666;
     color: #fff;
     font-weight: 500;
+}
+
+th.data-action {
+    min-width: 110px;
 }
 
 .item-datatables {

@@ -72,7 +72,7 @@ $(document).ready(function(){
     		{%- endif -%}
 	`});
 	var delID = null;
-	var table = $("#view").DataTable({
+	var table = $("#qc-table-datatables").DataTable({
 		order: [orders.length ? orders : [0, 'Asc']],
         processing: true,
         serverSide: true,
@@ -99,28 +99,28 @@ $(document).ready(function(){
         }
     });
 
-	$("#view tbody").on( "click", "td .qc-view", function(e){
+	$("#qc-table-datatables tbody").on( "click", "td .qc-view", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		var path = "{{ path(config.path.form, {action: 'read', id: '0000'}) }}";
 		path = path.replace("0000", row.id);
 		document.location = path;
 	})
 
-	$("#view tbody").on( "click", "td .qc-edit", function(e){
+	$("#qc-table-datatables tbody").on( "click", "td .qc-edit", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		var path = "{{ path(config.path.form, {action: 'update', id: '0000'}) }}";
 		path = path.replace("0000", row.id);
 		document.location = path;
 	})
 
-	$("#view tbody").on( "click", "td .qc-delete", function(e){
+	$("#qc-table-datatables tbody").on( "click", "td .qc-delete", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		UIkit.modal.confirm('Are you sure want to delete data {{ config.title }}?').then(function() {
 			var path = "{{ path(config.path.remove, {action: 'delete', id: '0000'}) }}";
 			path = path.replace("0000", row.id);
 			$.get(path, function(data, status){
 				if(status === 'success'){
-					$("#view").DataTable().ajax.reload();
+					$("#qc-table-datatables").DataTable().ajax.reload();
 				}
 			});
 		}, function(){});
@@ -139,14 +139,14 @@ $(document).ready(function(){
 	<div class="uk-card-header uk-border-rounded">
 		<h3><b>{{ config.title }}</b></h3>
 	</div>
-	<div class="uk-card-body">
-		<table id="view" class="uk-table uk-table-hover uk-table-striped" style="width:100%">
+	<div class="uk-card-body uk-overflow-auto">
+		<table id="qc-table-datatables" class="uk-table uk-table-hover uk-table-striped" style="width:100%">
             <thead>
                 <tr>
                     {% for item in config.view.select %}
                     <th>{{ item }}</th>
                     {% endfor %}
-                    <th></th>
+                    <th class="data-action"></th>
                 </tr>
             </thead>
         </table>
