@@ -249,7 +249,7 @@ class Builder extends AbstractController {
         $query = $request->query->all();
         
         $orders = [];
-        $this->config->getView()->setSelect($this->config->getView()->getExport());
+        
         $selects = array_flip($this->config->getView()->getSelect());
         $selectsKeys = array_keys($selects);
         foreach($query['order'] as $order){
@@ -259,6 +259,7 @@ class Builder extends AbstractController {
         
         $this->config->getView()
             ->setEntity($this->config->getEntity())
+            ->setSelect($this->config->getView()->getExport())
             ->setOrders($orders)
             ->setQ($query['search']['value'])
             ->setLength(0)
@@ -266,7 +267,7 @@ class Builder extends AbstractController {
        
         $items = $this->query->set($this->config->getView())->generate();
         
-        $array = [$selectsKeys];
+        $array = [array_keys($this->config->getView()->getExport())];
         $array = array_merge($array, $items);
         
         $spreadsheet = new Spreadsheet();
