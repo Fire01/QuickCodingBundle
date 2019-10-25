@@ -91,11 +91,20 @@
     	    })
     	    </script>
     	{% endif %}
-    	{#
-    	{% if 'file' in blocks %}
+    	
+    	{% if 'multifile' in blocks %}
     	    <script>
-    	    $(".uk-upload input[type='file']").on('change', function(event){
-				input = this;
+    	    $("input[type='file'].multifile").on('change', function(event){
+				var id = this.id;
+				var no = window['multifile_' + id].length ? window['multifile_' + id][window['multifile_' + id].length - 1].no++ : 0;
+
+				var clone = $(this).clone();
+			    clone.attr('id', id + '_' + no);
+			    $('#container_multifile_' + id).html(clone);
+
+			    $(this).val('');
+				console.log(this);
+				/*
     	    	if (!this.multiFiles) this.multiFiles = [];
         	    var target = $(this).parent().parent().find('.uk-upload-target');
 				target.html('');
@@ -118,10 +127,11 @@
 						console.log(input.multiFiles);
 					})
                 }
+                */
     	    })
     	    </script>
     	{% endif %}
-    	#}
+    	
     	{% if 'imageupload' in blocks %}
     	    <script>
     	    $(".widget-image-upload .uk-form-custom input[type='file']").on('change', function(event){
@@ -288,7 +298,7 @@
 {%- block choice_widget_collapsed -%}
 	{%- if not form.parent.vars.disabled -%}
     	{%- if placeholder is none -%}
-            {% set placeholder = 'Select ' ~ form.vars.label %}
+            {% set placeholder = 'Select ' ~ (form.vars.label ? form.vars.label : form.vars.name|humanize) %}
         {%- endif -%}
         {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
             {% set required = false %}
@@ -341,7 +351,7 @@
     <div class="uk-margin" uk-margin>
         <div uk-form-custom="target: true" class="uk-width-1-1">
             {{- block('form_widget_simple') -}}
-            <input class="uk-input uk-input" type="text" placeholder="Select file" disabled>
+            <input class="uk-input uk-input" type="text" placeholder="Select {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}" disabled>
         </div>
     </div>
 {% endblock %}
@@ -356,9 +366,24 @@
     	{%- if not form.parent.vars.disabled -%}
     	<div uk-form-custom>
             {{- block('form_widget_simple') -}}
-            <button class="uk-button uk-button-default uk-button-small" type="button" tabindex="-1"> <span uk-icon="icon: upload"></span> Select Image</button>
+            <button class="uk-button uk-button-default uk-button-small" type="button" tabindex="-1"> <span uk-icon="icon: upload"></span> Select {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}</button>
     	</div>
     	{%- endif -%}
+    </div>
+{% endblock %}
+
+{# =========================================================== Multifile Widget ===========================================================#}
+{% block multifile_widget -%}
+	{%- set type = type|default('file') -%}
+    <div class="uk-margin" uk-margin>
+        <div class="js-upload" uk-form-custom>
+            {{- block('form_widget_simple') -}}
+            <button class="uk-button uk-button-default" type="button" tabindex="-1">Select  {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}</button>
+        </div>
+        <div id="container_multifile_{{ form.vars.id }}"></div>
+        <script>
+			var multifile_{{ form.vars.id }} = [];
+        </script>
     </div>
 {% endblock %}
 
