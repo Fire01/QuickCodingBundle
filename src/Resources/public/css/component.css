@@ -336,3 +336,22 @@ th.data-action {
 .widget-image-upload .uk-form-custom button{
 	width:202px;
 }
+
+span.uk-badge input{
+	display:none;
+}
+
+.target-multifile span.uk-badge {
+    padding: 10px;
+    margin-right: 10px;
+}
+
+.target-multifile span.uk-badge span[uk-icon] {
+    color: #ffffff;
+    background: #F44336;
+    width: 14px;
+    padding: 2px;
+    border-radius: 50%;
+    margin-left: 10px;
+    cursor: pointer;
+}

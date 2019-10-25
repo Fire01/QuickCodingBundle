@@ -3,7 +3,6 @@ namespace Fire01\QuickCodingBundle\FormType;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class MultifileType extends AbstractType
 {
@@ -11,7 +10,8 @@ class MultifileType extends AbstractType
     {
         $resolver->setDefaults([
             'multiple' => true,
-            'attr' => ['class' => 'multifile']
+            'mapped' => false,
+            'attr' => ['allow' => null],
         ]);
     }
     
