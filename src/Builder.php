@@ -91,7 +91,7 @@ class Builder extends AbstractController {
         
         if($this->config->getACL()->canCreate($this->getUser()->getRoles())){
             $this->config->addActionbar(new Action([
-                'type' => 'js',
+                'type' => 'link',
                 'text' => 'Create ' . $this->config->getTitle(),
                 'icon' => 'plus-circle',
                 'path' => $pathNew ? $pathNew : $this->config->getPathForm(),

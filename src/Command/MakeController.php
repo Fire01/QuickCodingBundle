@@ -96,11 +96,11 @@ final class MakeController extends AbstractMaker
         }
         
         $formClass = $input->getArgument('form-class');
-
-        $controllerPath = $generator->generateController($controllerClassNameDetails->getFullName(), __DIR__ . '/../Resources/skeleton/controller/Controller.tpl.php',
+        $generator->generateController($controllerClassNameDetails->getFullName(), __DIR__ . '/../Resources/skeleton/controller/Controller.tpl.php',
             [
                 'route_path'    => Str::asRoutePath($controllerClassNameDetails->getRelativeNameWithoutSuffix()),
                 'route_name'    => Str::asRouteName($controllerClassNameDetails->getRelativeNameWithoutSuffix()),
+                'title'         => $this->readable($input->getArgument('entity-class')),
                 'entity_name'   => $boundClassDetails->getFullName(),
                 'form_name'     => $formClass,
                 'columns'       => $columns
@@ -123,5 +123,9 @@ final class MakeController extends AbstractMaker
     private function isTwigInstalled()
     {
         return class_exists(TwigBundle::class);
+    }
+    
+    private function readable($string){
+        return trim(ucfirst(preg_replace(['/(?<=[^A-Z])([A-Z])/', '/(?<=[^0-9])([0-9])/'], ' $0', $string)));
     }
 }
