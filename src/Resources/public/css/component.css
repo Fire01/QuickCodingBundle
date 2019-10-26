@@ -316,13 +316,16 @@ th.data-action {
 }
 
 .container-image-upload {
-	display: inline-block;
     border: 1px solid #e5e5e5;
+    border-radius: 5px;
     max-width: 200px;
     max-height: 200px;
     margin-bottom: 5px;
     text-align: center;
-    border-radius: 5px;
+}
+
+.qc-button-upload{
+	font-size:12px;
 }
 
 .container-image-upload img{
@@ -348,7 +351,8 @@ th.data-action {
     color: #fff;
 }
 
-span.uk-badge input{
+span.uk-badge input,
+.container-multifile-image input{
 	display:none;
 }
 
@@ -362,7 +366,38 @@ span.uk-badge input{
     background: #F44336;
     width: 14px;
     padding: 2px;
-    border-radius: 50%;
+    border-radius: 5px;
     margin-left: 10px;
+    cursor: pointer;
+}
+
+.container-multifile-image {
+    display: inline-block;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 10px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.container-multifile-image img{
+	height: 100%;
+    width: 100%;
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+}
+
+.container-multifile-image span[uk-icon] {
+	position: relative;
+    top: -200px;
+    right: -87px;
+    color: #ffffff;
+    background: #F44336;
+    width: 14px;
+    padding: 2px;
+    border-radius: 5px;
     cursor: pointer;
 }
