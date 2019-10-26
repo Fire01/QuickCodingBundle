@@ -77,7 +77,7 @@ class Builder extends AbstractController {
         return $this->generateView();
     }
     
-    function generateView($pathNew=null, $params=null){
+    function generateView($pathNew=null){
         Validator::view($this->config);
        
         $this->config->addActionbar(new Action([
@@ -95,7 +95,7 @@ class Builder extends AbstractController {
                 'text' => 'Create ' . $this->config->getTitle(),
                 'icon' => 'plus-circle',
                 'path' => $pathNew ? $pathNew : $this->config->getPathForm(),
-                'params' => $params ? array_merge($params, ['action' => 'create']) : ['action' => 'create'],
+                'params' => array_merge($this->config->getParams(), ['action' => 'create']),
                 'target' => 'route'
             ]));
         }
@@ -149,7 +149,7 @@ class Builder extends AbstractController {
                     'text' => 'Edit',
                     'icon' => 'pencil',
                     'path' => $this->config->getPathForm(),
-                    'params' => ['action' => 'update', 'id' => $item->getId()],
+                    'params' => array_merge($this->config->getParams(), ['action' => 'update', 'id' => $item->getId()]),
                     'target' => 'route'
                 ]));
             }
@@ -167,7 +167,7 @@ class Builder extends AbstractController {
             $em->persist($item);
             $em->flush();
             
-            return $this->redirectToRoute($this->config->getPathView());
+            return $this->redirectToRoute($this->config->getPathView(), $this->getConfig()->getParams());
         }
         
         return $this->render($this->config->getTemplateForm(), ["config" => $this->config, "form" => $form->createView()]);

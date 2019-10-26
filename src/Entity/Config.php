@@ -10,6 +10,7 @@ class Config {
     protected $viewType;
     protected $view = null;
     protected $path = ['view' => null, 'form' => null, 'remove' => null];
+    protected $params;
     protected $action;
     protected $actionbar = [];
     protected $template = ['view' => null, 'form' => null];
@@ -26,6 +27,7 @@ class Config {
         $this->setViewType(isset($config['viewType']) && $config['viewType'] ? $config['viewType'] : null);
         $this->setTemplate(isset($config['template']) && $config['template'] ? $config['template'] : null);
         
+        $this->setParams(isset($config['params']) && $config['params'] ? $config['params'] : null);
         $this->setPath(isset($config['path']) && $config['path'] ? $config['path'] : null);
         $this->setAction(isset($config['action']) && $config['action'] ? $config['action'] : null);
         
@@ -44,6 +46,7 @@ class Config {
             'viewType'  => $this->getViewType(),
             'template'  => $this->getTemplate(),
             'path'      => $this->getPath(),
+            'params'      => $this->getParams(),
             'action'    => $this->getAction(),
             'actionbar' => $this->getActionbar(),
             'ACL'       => $this->getACL()
@@ -97,6 +100,16 @@ class Config {
     
     function setView(?View $view){
         $this->view = $view;
+        
+        return $this;
+    }
+    
+    function getParams(): array{
+        return $this->params ? $this->params : [];
+    }
+    
+    function setParams(?array $params){
+        $this->params = $params;
         
         return $this;
     }
@@ -196,6 +209,7 @@ class Config {
         $action->setType('link');
         $action->setClass('uk-button-danger');
         $action->setPath($path ? $path : $this->getPathView());
+        $action->setParams($this->getParams());
         $action->setTarget('route');
         $action->setIcon('close');
         

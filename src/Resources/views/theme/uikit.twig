@@ -40,7 +40,9 @@
         	</div>
         	<div class="uk-card-body">
 	{%- if not form.vars.disabled -%}
-                <form{% if name != '' %} name="{{ name }}" id="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+                <form{% if name != '' %} 
+                	name="{{ name }}" id="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %}
+                	{% for attrname, attrvalue in attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}{% if multipart %} enctype="multipart/form-data"{% endif %} onsubmit="__ajaxLoading.show()">
                 {%- if form_method != method -%}
                     <input type="hidden" name="_method" value="{{ method }}" />
                 {%- endif -%}
@@ -132,13 +134,32 @@
 					target.append('<div class="uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>Only "' + allow.join(",") + '" files are allowed</p></div>');
 				}else{
 					var item = $('<span class="uk-badge">' + file.name + ' (' + size + ')</span>').appendTo(target);
-				    var btnDelete = item.append('<span uk-icon="minus-circle"></span>');
+				    var btnDelete = $('<span uk-icon="minus-circle"></span>').appendTo(item);
 
 					item.append(clone);
 					btnDelete.on('click', function(){item.remove()});	
 				}
 				
 			    $(this).val(null);
+    	    })
+    	    
+    	    $(".multifile-remote span").click(function(event){
+    	    	var el = $(this);
+    	    	var fileName = el.parent().find('a').html().replace(/^.*[\\\/]/, '');
+        	    UIkit.modal.confirm('Are you sure want to delete "' + (fileName.length > 30 ? fileName.substr(0, 30) + '...' : fileName) + '"?').then(function() {
+        	    	$.ajax({
+                        url: event.currentTarget.dataset.remove,
+                        dataType: 'json',
+                        success: function(response, data, header){
+                            var msg = response && response.success ? 'Remove file succesful' : header.statusText;
+                        	el.parent().parent().prepend('<div class="uk-alert-success" uk-alert><a class="uk-alert-close" uk-close></a><p>' + msg + '</p></div>');
+                        	if(response.success)	el.parent().remove();
+                        },
+                        error: function(error){
+                            el.parent().parent().prepend('<div class="uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>Remove file error : ' + error.statusText + '</p></div>')
+                        }
+            		});
+        		}, function(){});
     	    })
     	    </script>
     	{% endif %}
@@ -209,11 +230,11 @@
         {%- endif -%}
         <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
             {%- if translation_domain is same as(false) -%}
-                {{- label -}}
+                {{- label|raw -}}
             {%- else -%}
-                {{- label|trans({}, translation_domain) -}}
+                {{- label|trans({}, translation_domain)|raw -}}
             {%- endif -%}
-        </{{ element|default('label') }}>
+        </{{ element|default('label')|raw }}>
     {%- endif -%}
 {%- endblock form_label -%}
 
@@ -365,11 +386,23 @@
     {%- set attr = attr|merge({ multiple: false}) -%}
     {%- set attr = attr|merge({ class: ' multifile'}) -%}
     <div class="uk-margin" uk-margin>
+    	{%- if not form.parent.vars.disabled -%}
         <div class="js-upload" uk-form-custom>
             {{- block('form_widget_simple') -}}
             <button class="uk-button uk-button-default" type="button" tabindex="-1">Add {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}</button>
         </div>
-        <div class="target-multifile"></div>
+        {%- endif -%}
+        <div class="target-multifile">
+        	{% for data in form.vars.data %}
+        	    {% set remove = data.remove is iterable ? (data.remove.path is defined ? path(data.remove.path, {id: data.remove.id}) : data.remove.url) : data.remove %}
+        		<span class="uk-badge multifile-remote">
+            		<a href="{{ asset(data.source) }}" target="_blank">{{ data.name is defined ? data.name : data.source }}</a>
+            		{%- if not form.parent.vars.disabled -%}
+            		<span uk-icon="minus-circle" data-remove="{{ remove }}" class="uk-icon"></span>
+            		{%- endif -%}
+        		</span>
+        	{% endfor %}
+        </div>
     </div>
 {% endblock %}
 

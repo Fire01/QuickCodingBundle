@@ -79,7 +79,7 @@ $(document).ready(function(){
         pageLength: 25,
         orderMulti: true,
         ajax: {
-            url: "{{ config.path.view is iterable ? path(config.path.view[0], config.path.view[1]) : path(config.path.view) }}",
+            url: "{{ config.path.view is iterable ? path(config.path.view[0], config.path.view[1]) : path(config.path.view, config.params) }}",
             data: function(params) {params.type = "json";delete params.columns}
         },
         columns: columns,
@@ -101,14 +101,16 @@ $(document).ready(function(){
 	
 	$("#qc-table-datatables tbody").on( "click", "td .qc-view", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path(config.path.form, {action: 'read', id: '0000'}) }}";
+		{% set params = config.params ? config.params|merge({action: 'read', id: '0000'}) : {action: 'read', id: '0000'} %}
+		var path = "{{ path(config.path.form, params) }}";
 		path = path.replace("0000", row.id);
 		document.location = path;
 	})
 
 	$("#qc-table-datatables tbody").on( "click", "td .qc-edit", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		var path = "{{ path(config.path.form, {action: 'update', id: '0000'}) }}";
+		{% set params = config.params ? config.params|merge({action: 'update', id: '0000'}) : {action: 'update', id: '0000'} %}
+		var path = "{{ path(config.path.form, params) }}";
 		path = path.replace("0000", row.id);
 		document.location = path;
 	})
@@ -116,7 +118,8 @@ $(document).ready(function(){
 	$("#qc-table-datatables tbody").on( "click", "td .qc-delete", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
 		UIkit.modal.confirm('Are you sure want to delete data {{ config.title }}?').then(function() {
-			var path = "{{ path(config.path.remove, {action: 'delete', id: '0000'}) }}";
+			{% set params = config.params ? config.params|merge({action: 'delete', id: '0000'}) : {action: 'delete', id: '0000'} %}
+			var path = "{{ path(config.path.remove, params) }}";
 			path = path.replace("0000", row.id);
 			$.get(path, function(data, status){
 				if(status === 'success'){

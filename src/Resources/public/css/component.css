@@ -337,6 +337,15 @@ th.data-action {
 	width:202px;
 }
 
+.uk-badge.multifile-remote {
+    background: #5ad296;
+}
+
+.uk-badge.multifile-remote a {
+    text-decoration: none;
+    color: #fff;
+}
+
 span.uk-badge input{
 	display:none;
 }
