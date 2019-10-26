@@ -121,19 +121,34 @@
     	{% if 'multifile' in blocks %}
     	    <script>
     	    $("input[type='file'].multifile").on('change', function(event){
-        	    var allow = $(this).attr('allow') ? $(this).attr('allow').split(",") : [];
+        	    var type = event.currentTarget.dataset.type;
+        	    var allow = type == "image" ? ["image"] : ($(this).attr('allow') ? $(this).attr('allow').split(",") : []);
 				var target = $(this).parent().parent().find('.target-multifile');
 				var clone = $(this).clone();
 			    clone.attr('id', null);
 
 			    var file = this.files[0];
 			    var size = qc.bytesToSize(file.size);
-			    var type = file.type.split("/")[0];
+			    var ftype = file.type.split("/")[0];
 
-			    if(allow.length && allow.indexOf(type) < 0){
+			    if(allow.length && allow.indexOf(ftype) < 0){
 					target.append('<div class="uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>Only "' + allow.join(",") + '" files are allowed</p></div>');
 				}else{
-					var item = $('<span class="uk-badge">' + file.name + ' (' + size + ')</span>').appendTo(target);
+					switch(type){
+    					case "image":
+    						var reader = new FileReader();
+    						
+    						var item = $('<div class="container-multifile-image"></div>').appendTo(target);
+    						var image = $('<img>').appendTo(item);
+
+    						reader.onload = function(e) {image.attr('src', e.target.result)}
+    					    reader.readAsDataURL(file);
+    						break;
+    					default:
+    						var item = $('<span class="uk-badge">' + file.name + ' (' + size + ')</span>').appendTo(target);
+    						break;
+    				}
+					
 				    var btnDelete = $('<span uk-icon="minus-circle"></span>').appendTo(item);
 
 					item.append(clone);
@@ -143,9 +158,19 @@
 			    $(this).val(null);
     	    })
     	    
-    	    $(".multifile-remote span").click(function(event){
+    	    $(".container-multifile-image span, .multifile-remote span").click(function(event){
     	    	var el = $(this);
-    	    	var fileName = el.parent().find('a').html().replace(/^.*[\\\/]/, '');
+    	    	var file = el.parent().find('a');
+    	    	
+				switch(event.currentTarget.dataset.type){
+					case "image":
+						var fileName = file.find('img').attr('src').replace(/^.*[\\\/]/, '');
+						break;
+					default:
+						var fileName = file.html().replace(/^.*[\\\/]/, '');
+						break;
+				}
+    	    	
         	    UIkit.modal.confirm('Are you sure want to delete "' + (fileName.length > 30 ? fileName.substr(0, 30) + '...' : fileName) + '"?').then(function() {
         	    	$.ajax({
                         url: event.currentTarget.dataset.remove,
@@ -374,7 +399,7 @@
     	{%- if not form.parent.vars.disabled -%}
     	<div uk-form-custom>
             {{- block('form_widget_simple') -}}
-            <button class="uk-button uk-button-default uk-button-small" type="button" tabindex="-1"> <span uk-icon="icon: upload"></span> Select {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}</button>
+            <button class="uk-button uk-button-default uk-button-small qc-button-upload" type="button" tabindex="-1"> <span uk-icon="icon: upload"></span> Select {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}</button>
     	</div>
     	{%- endif -%}
     </div>
@@ -385,6 +410,7 @@
 	{%- set type = type|default('file') -%}
     {%- set attr = attr|merge({ multiple: false}) -%}
     {%- set attr = attr|merge({ class: ' multifile'}) -%}
+    {%- set attr = attr|merge({ 'data-type': form.vars.file_type}) -%}
     <div class="uk-margin" uk-margin>
     	{%- if not form.parent.vars.disabled -%}
         <div class="js-upload" uk-form-custom>
@@ -395,12 +421,23 @@
         <div class="target-multifile">
         	{% for data in form.vars.data %}
         	    {% set remove = data.remove is iterable ? (data.remove.path is defined ? path(data.remove.path, {id: data.remove.id}) : data.remove.url) : data.remove %}
-        		<span class="uk-badge multifile-remote">
+        	    {%- if form.vars.file_type == 'image' -%}
+    			<div class="container-multifile-image">
+    				<a href="{{ asset(data.source) }}" target="_blank">
+            			<img src="{{ asset(data.source) }}" onerror="this.src='{{ asset(quick_coding.public ~ 'images/default-image.png') }}'">
+        			</a>
+            		{%- if not form.parent.vars.disabled -%}
+            		<span uk-icon="minus-circle" data-remove="{{ remove }}" data-type="{{ form.vars.file_type }}" class="uk-icon"></span>
+            		{%- endif -%}
+            	</div>
+    			{%- else -%}
+    			<span class="uk-badge multifile-remote">
             		<a href="{{ asset(data.source) }}" target="_blank">{{ data.name is defined ? data.name : data.source }}</a>
             		{%- if not form.parent.vars.disabled -%}
-            		<span uk-icon="minus-circle" data-remove="{{ remove }}" class="uk-icon"></span>
+            		<span uk-icon="minus-circle" data-remove="{{ remove }}" data-type="{{ form.vars.file_type }}" class="uk-icon"></span>
             		{%- endif -%}
         		</span>
+        		{%- endif -%}
         	{% endfor %}
         </div>
     </div>

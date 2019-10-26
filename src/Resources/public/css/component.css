@@ -316,11 +316,13 @@ th.data-action {
 }
 
 .container-image-upload {
-    border: 1px dashed #e5e5e5;
+	display: inline-block;
+    border: 1px solid #e5e5e5;
     max-width: 200px;
     max-height: 200px;
     margin-bottom: 5px;
     text-align: center;
+    border-radius: 5px;
 }
 
 .container-image-upload img{
