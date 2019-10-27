@@ -1,14 +1,10 @@
 {# =========================================================== Form Start and End ===========================================================#}
 {%- block form_start -%}
     {%- if not form.vars.disabled -%}
-    	{%- set blocks = [] -%}
-    	{%- for item in form -%}{%- set blocks = blocks|merge([item.vars.block_prefixes[(item.vars.block_prefixes|length) - 2]]) -%}{%- endfor -%}
-        
-        {% if 'choice' in blocks or 'entity' in blocks %}
-        	<link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/selectize/css/selectize.css') }}" />
-        	<!--[if IE 8]><script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/es5.js') }}"></script><![endif]-->
-        	<script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/jquery-ui_sortable.min.js') }}"></script>
-    	    <script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/standalone/selectize.min.js') }}"></script>
+    	{%- set blocks = form|all_widget_type -%}
+    	
+    	{% if 'money' in blocks %}
+        	<script src="{{ asset(quick_coding.public ~ 'plugins/inputmask/jquery.inputmask.min.js') }}"></script>
     	{% endif %}
     	
     	{% if 'datepicker' in blocks or 'timepicker' in blocks or 'datetimepicker' in blocks %}
@@ -17,12 +13,19 @@
         	<script src="{{ asset(quick_coding.public ~ 'plugins/flatpickr/flatpickr.min.js') }}"></script>
     	{% endif %}
     	
-    	{% if 'richtext' in blocks %}
-        	<script src="{{ asset(quick_coding.public ~ 'plugins/tinymce/tinymce.min.js') }}"></script>
-    	{% endif %}
-    	
     	{% if 'google_autocomplete' in blocks %}
         	<script src="https://maps.googleapis.com/maps/api/js?key={{ form.vars.google_maps_key }}&libraries=places"></script>
+    	{% endif %}
+    	
+        {% if 'choice' in blocks or 'entity' in blocks %}
+        	<link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/selectize/css/selectize.css') }}" />
+        	<!--[if IE 8]><script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/es5.js') }}"></script><![endif]-->
+        	<script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/jquery-ui_sortable.min.js') }}"></script>
+    	    <script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/standalone/selectize.min.js') }}"></script>
+    	{% endif %}
+    	
+    	{% if 'richtext' in blocks %}
+        	<script src="{{ asset(quick_coding.public ~ 'plugins/tinymce/tinymce.min.js') }}"></script>
     	{% endif %}
     	
     	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-form-horizontal')|trim }) -%}
@@ -61,11 +64,12 @@
     </div>
     
     {%- if not form.vars.disabled -%}
-        {%- set blocks = [] -%}
-    	{%- for item in form -%}{%- set blocks = blocks|merge([item.vars.block_prefixes[(item.vars.block_prefixes|length) - 2]]) -%}{%- endfor -%}
-        
-        {% if 'choice' in blocks or 'entity' in blocks %}
-    	    <script>$('select').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
+        {%- set blocks = form|all_widget_type -%}
+    	
+        {% if 'money' in blocks %}
+        	<script>
+        	$('.qc-money-inputmask').inputmask();
+        	</script>
     	{% endif %}
     	
     	{% if 'datepicker' in blocks %}
@@ -78,6 +82,10 @@
     	
     	{% if 'datetimepicker' in blocks %}
     	    <script>$(".flatpickr-datetimepicker").flatpickr({enableTime: true, time_24hr:true, allowInput:true});</script>
+    	{% endif %}
+    	
+    	{% if 'choice' in blocks or 'entity' in blocks %}
+    	    <script>$('select').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
     	{% endif %}
     	
     	{% if 'richtext' in blocks %}
@@ -376,6 +384,14 @@
 	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-radio')|trim }) -%}
     <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {%- endblock radio_widget -%}
+
+{# =========================================================== Money Widget ===========================================================#}
+{% block money_widget -%}
+    {%- set inputmask = form.vars.inputmask|json_encode|raw -%}
+	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' qc-money-inputmask')|trim }) -%}
+	{%- set attr = attr|merge({ 'data-inputmask': inputmask[1:((inputmask| length) - 2)] }) -%}
+    {{- block('form_widget_simple') -}}
+{% endblock %}
 
 {# =========================================================== File Widget ===========================================================#}
 

@@ -38,6 +38,10 @@
         <service id="Fire01\QuickCodingBundle\FormType\CurrentuserType" autoconfigure="true">
 		 	<argument type="service" id="security.helper" />
         </service>
+        
+        <!-- Maker Service -->
+		<service id="Fire01\QuickCodingBundle\Twig\TwigExtension" autoconfigure="true"></service>
+		<!-- End Maker Service -->
 
     </services>
     
