@@ -14,7 +14,7 @@
     	{% endif %}
     	
     	{% if 'google_autocomplete' in blocks %}
-        	<script src="https://maps.googleapis.com/maps/api/js?key={{ form.vars.google_maps_key }}&libraries=places"></script>
+        	<script src="https://maps.googleapis.com/maps/api/js?key={{ gmaps_key }}&libraries=places&language="></script>
     	{% endif %}
     	
         {% if 'choice' in blocks or 'entity' in blocks %}

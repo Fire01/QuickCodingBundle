@@ -12,9 +12,8 @@ class GoogleAutocompleteType extends AbstractType
 {
     
     public function buildView(FormView $view, FormInterface $form, array $options) {
-        if(!isset($_ENV['GOOGLE_MAPS_KEY'])) throw new InvalidConfigurationException('Please set google maps api key "GOOGLE_MAPS_KEY" on .env  to use GoogleAutocompleteType!');
+        if(!isset($_ENV['GOOGLE_MAPS_KEY'])) throw new InvalidConfigurationException('Please set google maps api key "GOOGLE_MAPS_KEY" on .env to use GoogleAutocompleteType!');
         
-        $view->parent->vars['google_maps_key'] = $_ENV['GOOGLE_MAPS_KEY'];
         $view->vars['country'] = $options['country'];
         $view->vars['lat'] = $options['lat'];
         $view->vars['lng'] = $options['lng'];
