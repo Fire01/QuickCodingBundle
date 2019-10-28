@@ -172,13 +172,13 @@
     	    	
 				switch(event.currentTarget.dataset.type){
 					case "image":
-						var fileName = file.find('img').attr('src').replace(/^.*[\\\/]/, '');
+						var fileName = file.find('img').attr('alt').replace(/^.*[\\\/]/, '');
 						break;
 					default:
 						var fileName = file.html().replace(/^.*[\\\/]/, '');
 						break;
 				}
-    	    	
+				
         	    UIkit.modal.confirm('Are you sure want to delete "' + (fileName.length > 30 ? fileName.substr(0, 30) + '...' : fileName) + '"?').then(function() {
         	    	$.ajax({
                         url: event.currentTarget.dataset.remove,
@@ -440,7 +440,7 @@
         	    {%- if form.vars.file_type == 'image' -%}
     			<div class="container-multifile-image">
     				<a href="{{ asset(data.source) }}" target="_blank">
-            			<img src="{{ asset(data.source) }}" onerror="this.src='{{ asset(quick_coding.public ~ 'images/default-image.png') }}'">
+            			<img src="{{ asset(data.source) }}" alt="{{ data.name is defined ? data.name : data.source }}" onerror="this.src='{{ asset(quick_coding.public ~ 'images/default-image.png') }}'">
         			</a>
             		{%- if not form.parent.vars.disabled -%}
             		<span uk-icon="minus-circle" data-remove="{{ remove }}" data-type="{{ form.vars.file_type }}" class="uk-icon"></span>
