@@ -85,8 +85,45 @@
     	{% endif %}
     	
     	{% if 'choice' in blocks or 'entity' in blocks %}
-    	    <script>$('select').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
+    	    <script>$('select').not('.selectize-ajax').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
     	{% endif %}
+    	
+    	{% if 'selectize_ajax' in blocks %}
+    	    <script>
+        	    $('.selectize-ajax').each(function(idx, el){
+            	    var data = JSON.parse(el.dataset.selectize);
+            	    var url = '{{ asset('') }}' + data.url;
+            	    var params = Object.assign({}, data.params);
+            	    url = url.replace("//", "/");
+            	    
+        	    	$(this).selectize({
+            	        valueField: data.valueField,
+            	        labelField: data.labelField,
+            	        searchField: data.searchField,
+            	        options: [],
+            	        create: false,
+            	        load: function(query, callback) {
+            	            if (!query.length) return callback();
+            	            params.q = query;
+            	            
+            	            $.ajax({
+            	                url: url,
+            	                type: data.method,
+            	                dataType: data.dataType,
+            	                data: params,
+            	                error: function() {
+            	                    callback();
+            	                },
+            	                success: function(res) {
+            	                    callback(res);
+            	                }
+            	            });
+            	        }
+            	    });
+        	    });
+    	    </script>
+    	{% endif %}
+    	
     	
     	{% if 'richtext' in blocks %}
     	    <script>
@@ -393,8 +430,13 @@
     {{- block('form_widget_simple') -}}
 {% endblock %}
 
-{# =========================================================== File Widget ===========================================================#}
+{# =========================================================== Selectize Ajax Widget ===========================================================#}
+{%- block selectize_ajax_widget -%}
+    {%- set attr = attr|merge({ 'data-selectize': (form.vars.selectize|json_encode)}) -%}
+    {{- block('choice_widget_collapsed') -}}
+{%- endblock selectize_ajax_widget -%}
 
+{# =========================================================== File Widget ===========================================================#}
 {% block file_widget -%}
 	{%- set type = type|default('file') -%}
     <div class="uk-margin" uk-margin>

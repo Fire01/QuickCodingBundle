@@ -14,7 +14,8 @@ $(document).ready(function(){
 	}
 	
 	__ajaxLoading = UIkit.modal($("#__ajaxLoading"), {escClose: false, bgClose : false});
-	
+	/*
 	$(document).ajaxSend(function(){__ajaxLoading.show()});
 	$(document).ajaxComplete(function(){__ajaxLoading.hide()});
+	*/
 });

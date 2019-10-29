@@ -223,6 +223,13 @@ table#qc-table-datatables thead tr th {
     font-weight: 500;
 }
 
+.dataTables_processing {
+    background: #5ad296cc;
+    color: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+}
+
 th.data-action {
     min-width: 110px;
 }
