@@ -13,6 +13,7 @@ class TwigExtension extends AbstractExtension
     {
         return [
             new TwigFilter('all_widget_type', [$this, 'getAllWidgetType']),
+            new TwigFilter('serialize_data_selectize', [$this, 'getSerializeDataSelectize']),
         ];
     }
     
@@ -20,6 +21,25 @@ class TwigExtension extends AbstractExtension
     {
         $this->findWidget($form);
         return $this->widgets;
+    }
+    
+    public function getSerializeDataSelectize($form)
+    {
+        $options = $form->vars['selectize'];
+        $params = $options['params'];
+        $newParams = [];
+        foreach($params as $key => $param){
+            $value = $param;
+            if(strpos($param, 'val:') !== false){
+                $value = 'val:' . $form->parent->children[str_replace("val:", "", $param)]->vars['id'];
+            }
+            
+            $newParams[$key] = $value; 
+        }
+        
+        $options['params'] = $newParams;
+        
+        return json_encode($options);
     }
     
     

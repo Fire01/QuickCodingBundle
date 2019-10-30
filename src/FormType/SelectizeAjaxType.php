@@ -13,6 +13,7 @@ class SelectizeAjaxType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        /*
         $builder->addModelTransformer(new CallbackTransformer(function ($value) {
                 return $value;
             }, function ($value) use ($options) {
@@ -27,6 +28,7 @@ class SelectizeAjaxType extends AbstractType
                 return $value;
             })
         );
+        */
     }
     
     public function buildView(FormView $view, FormInterface $form, array $options) {
@@ -44,6 +46,9 @@ class SelectizeAjaxType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'attr' => [
+                'class' => 'selectize-ajax',
+            ],
             'valueField' => 'value',
             'labelField' => 'text',
             'searchField' => 'text',
@@ -51,10 +56,6 @@ class SelectizeAjaxType extends AbstractType
             'method' => 'get',
             'dataType' => 'json',
             'params' => [],
-            'attr' => [
-                'class' => 'selectize-ajax',
-            ],
-            
         ]);
     }
     
