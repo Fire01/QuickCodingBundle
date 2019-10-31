@@ -85,7 +85,7 @@
     	{% endif %}
     	
     	{% if 'choice' in blocks or 'entity' in blocks %}
-    	    <script>$('select').not('.selectize-ajax').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
+    	    <script>$('select.selectize').selectize({plugins: ['remove_button', 'drag_drop'], sortField: 'text', selectOnTab:true});</script>
     	{% endif %}
     	
     	{% if 'selectize_ajax' in blocks %}
@@ -93,8 +93,8 @@
         	    $('.selectize-ajax').each(function(idx, el){
             	    var data = JSON.parse(el.dataset.selectize);
             	    var url = '{{ asset('') }}' + data.url;
-            	    var params = data.params;
-            	    
+            	    var params = Object.assign({}, data.params);
+            	   
             	    url = url.replace("//", "/");
             	    
         	    	$(this).selectize({
@@ -109,7 +109,6 @@
 
             	            for(var i in params){
                         	    var param = params[i];
-                        	    console.log(param)
                         	    if(isNaN(param) && param.indexOf('val:') >= 0){
                             	    var id = param.replace("val:", "");
                         	    	params[i] = $("#" + id).val();
@@ -384,6 +383,10 @@
 {%- endblock choice_widget -%}
 
 {%- block choice_widget_collapsed -%}
+	{% set class = attr.class is defined ? attr.class : null %}	
+	{% if 'selectize-ajax' in class == false %}
+		{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' selectize')|trim }) -%}
+	{% endif %}
 	{%- if not form.parent.vars.disabled -%}
     	{%- if placeholder is none -%}
             {% set placeholder = 'Select ' ~ (form.vars.label ? form.vars.label : form.vars.name|humanize) %}

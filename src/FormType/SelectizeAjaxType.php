@@ -7,28 +7,65 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\CallbackTransformer;
 
 class SelectizeAjaxType extends AbstractType
 {
+    private $em;
+    
+    function __construct($em){
+        $this->em = $em;    
+    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /*
-        $builder->addModelTransformer(new CallbackTransformer(function ($value) {
-                return $value;
-            }, function ($value) use ($options) {
-                dd($value);
-                if($options['radixPoint'] == "."){
-                    $value = str_replace($options['groupSeparator'], "", $value);
-                }else{
-                    $value = str_replace($options['groupSeparator'], "", $value);
-                    $value = str_replace($options['radixPoint'], ".", $value);
-                }
+        //$builder->resetViewTransformers();
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event){
+            
+            $data = $event->getData();
+            
+            
+            /*
+            $maker_id = $data['maker'];
+            $model= $form->get('model');
+            $options = $model->getConfig()->getOptions();
+
+            if (!empty($maker_id)) {
+                unset($options['attr']['disabled']);
+                $options['choices'] = $this->extractor->getModelsFor($maker_id);
+
+                $form->remove('model');
+                $form->add('model', CarModelsSelectType::class, $options );
+            }
+        
+             */
+            if(!empty($data)){
+                $form = $event->getForm();
+                $name = $form->getName();
+                $parent = $form->getParent();
+                $options = $form->getConfig()->getOptions();
+                $parent->remove($name);
+                $options['choices'] = [$data => $data];
+                $parent->add($name, self::class, $options)->setData($data);
+                dump($parent->get($name)->getData());
+            }
+        });
+        
+        $em = $this->em;
+        $builder->addEventListener(FormEvents::SUBMIT, function(FormEvent $event) use ($options, $em){
+            $form = $event->getForm();
+            dd("OKE");
+            if($options['class']){
+                if(!$event->getData()) return;
+                $data = $em->getRepository($options['class'])->find($event->getData());
+                if (null === $data) throw new TransformationFailedException(sprintf('Data "%s" does not exist!', $event->getData()));
                 
-                return $value;
-            })
-        );
-        */
+                $event->setData($data);
+            }            
+        });
     }
     
     public function buildView(FormView $view, FormInterface $form, array $options) {
@@ -46,6 +83,7 @@ class SelectizeAjaxType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'class' => null,
             'attr' => [
                 'class' => 'selectize-ajax',
             ],

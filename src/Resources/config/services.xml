@@ -27,6 +27,10 @@
 		</service>
 		<!-- End Maker Service -->
 		
+		<service id="Fire01\QuickCodingBundle\FormType\SelectizeAjaxType" autoconfigure="true">
+        	<argument type="service" id="doctrine.orm.entity_manager" />
+        </service>
+		
         <service id="Fire01\QuickCodingBundle\FormType\FileuploadType" autoconfigure="true">
 		 	<argument key="$public_dir">%kernel.project_dir%/public/</argument>
         </service>
