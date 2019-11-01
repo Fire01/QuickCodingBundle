@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Validator\Constraints\Choice;
 
 class SelectizeAjaxType extends AbstractType
 {
@@ -22,42 +22,10 @@ class SelectizeAjaxType extends AbstractType
     
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        //$builder->resetViewTransformers();
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function(FormEvent $event){
-            
-            $data = $event->getData();
-            
-            
-            /*
-            $maker_id = $data['maker'];
-            $model= $form->get('model');
-            $options = $model->getConfig()->getOptions();
-
-            if (!empty($maker_id)) {
-                unset($options['attr']['disabled']);
-                $options['choices'] = $this->extractor->getModelsFor($maker_id);
-
-                $form->remove('model');
-                $form->add('model', CarModelsSelectType::class, $options );
-            }
-        
-             */
-            if(!empty($data)){
-                $form = $event->getForm();
-                $name = $form->getName();
-                $parent = $form->getParent();
-                $options = $form->getConfig()->getOptions();
-                $parent->remove($name);
-                $options['choices'] = [$data => $data];
-                $parent->add($name, self::class, $options)->setData($data);
-                dump($parent->get($name)->getData());
-            }
-        });
-        
+        $builder->resetViewTransformers();
         $em = $this->em;
+        
         $builder->addEventListener(FormEvents::SUBMIT, function(FormEvent $event) use ($options, $em){
-            $form = $event->getForm();
-            dd("OKE");
             if($options['class']){
                 if(!$event->getData()) return;
                 $data = $em->getRepository($options['class'])->find($event->getData());

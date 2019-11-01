@@ -280,7 +280,6 @@
 {%- endblock form_errors %}
 
 {# =========================================================== Form Label ===========================================================#}
-
 {%- block form_label -%}
 	{% set sub_prefixes = form.parent.vars.block_prefixes[form.parent.vars.block_prefixes|length - 2] %}
 	{% if sub_prefixes != 'choice' %}
