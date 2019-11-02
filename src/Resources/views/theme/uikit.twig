@@ -17,7 +17,7 @@
         	<script src="https://maps.googleapis.com/maps/api/js?key={{ gmaps_key }}&libraries=places&language="></script>
     	{% endif %}
     	
-        {% if 'choice' in blocks or 'entity' in blocks %}
+        {% if 'choice' in blocks or 'entity' in blocks or 'selectize_ajax' in blocks %}
         	<link rel="stylesheet" href="{{ asset(quick_coding.public ~ 'plugins/selectize/css/selectize.css') }}" />
         	<!--[if IE 8]><script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/es5.js') }}"></script><![endif]-->
         	<script src="{{ asset(quick_coding.public ~ 'plugins/selectize/js/jquery-ui_sortable.min.js') }}"></script>
