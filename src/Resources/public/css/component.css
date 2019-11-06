@@ -208,6 +208,14 @@ p.uk-textarea {
     opacity: 0.8;
 }
 
+.qc-header-datatables{
+    min-width: 600px;
+}
+
+.qc-footer-datatables{
+    min-width: 700px;
+}
+
 .dt-btn-search {
     margin-left: 10px;
     background-color: #32d296;
