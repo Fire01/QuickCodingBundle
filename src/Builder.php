@@ -70,10 +70,10 @@ class Builder extends AbstractController {
         
         if(count($this->config->getACL()->getRead())) $this->denyAccessUnlessGranted($this->config->getACL()->getRead());
         
-        return $this->generateView();
+        return $this->generateView(true);
     }
     
-    function generateView($pathNew=null){
+    function generateView($create=false){
         Validator::view($this->config);
        
         $this->config->addActionbar(new Action([
@@ -85,15 +85,17 @@ class Builder extends AbstractController {
             'target' => 'route'
         ]));
         
-        if($this->config->getACL()->canCreate($this->getUser()->getRoles())){
-            $this->config->addActionbar(new Action([
-                'type' => 'link',
-                'text' => 'Create ' . $this->config->getTitle(),
-                'icon' => 'plus-circle',
-                'path' => $pathNew ? $pathNew : $this->config->getPathForm(),
-                'params' => array_merge($this->config->getParams(), ['action' => 'create']),
-                'target' => 'route'
-            ]));
+        if($create){
+            if($this->config->getACL()->canCreate($this->getUser()->getRoles())){
+                $this->config->addActionbar(new Action([
+                    'type' => 'link',
+                    'text' => 'Create ' . $this->config->getTitle(),
+                    'icon' => 'plus-circle',
+                    'path' => $this->config->getPathForm(),
+                    'params' => array_merge($this->config->getParams(), ['action' => 'create']),
+                    'target' => 'route'
+                ]));
+            }
         }
         
         if($this->config->getView()->hasExport()){
@@ -245,7 +247,6 @@ class Builder extends AbstractController {
         $query = $request->query->all();
         
         $orders = [];
-        
         $selects = array_flip($this->config->getView()->getSelect());
         $selectsKeys = array_keys($selects);
         foreach($query['order'] as $order){
@@ -255,12 +256,12 @@ class Builder extends AbstractController {
         
         $this->config->getView()
             ->setEntity($this->config->getEntity())
-            ->setSelect($this->config->getView()->getExport())
+            ->addSelect(['id' => 'id'])
             ->setOrders($orders)
             ->setQ($query['search']['value'])
             ->setLength(0)
         ;
-       
+
         $items = $this->query->set($this->config->getView())->generate();
         
         $array = [array_keys($this->config->getView()->getExport())];
