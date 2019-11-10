@@ -50,7 +50,7 @@ class Query {
             foreach($this->view->getConditions() as $condition){
                 $param = "param_" . $counter;
                 $value = $condition[2];
-                $condition[2] = ":" . $param;
+                $condition[2] = strtolower($condition[1]) == "in" ? "(:" . $param . ")" : ":" . $param;
                 $connector = isset($condition[3]) ? $condition[3] : 'and';
                 if(isset($condition[3]))    array_pop($condition);
                 
@@ -67,7 +67,7 @@ class Query {
                 $counter++;
             }
         }
-        
+
         if(count($this->view->getSearch()) && $this->view->getQ()){
             $param = "param_" . $counter;
             $searchCondition = implode(" LIKE :" . $param . " OR ", $this->view->getSearch()) . " LIKE :" . $param;

@@ -35,7 +35,7 @@ class View
         if(isset($config['export']))     $this->setExport($config['export']);
         if(isset($config['alias']))     $this->setAlias($config['alias']);
         
-        $this->setJoin();
+        $this->setJoin(isset($config['join']) ? $config['join'] : []);
         
         return $this;
     }
@@ -195,9 +195,10 @@ class View
         return $this->join;
     }
     
-    function setJoin(){
+    function setJoin($join){
         $counter = 0;
-        $columns = array_merge(array_keys($this->select), array_keys($this->orders), $this->search);
+        $columns = array_filter(array_merge(array_keys($this->select), array_keys($this->orders), $this->search, $join));
+
         foreach($columns as $column){
             if(strpos($column, ".") !== false){
                 $relation = explode(".", $column);
