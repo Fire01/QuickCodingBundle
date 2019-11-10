@@ -139,7 +139,7 @@ class View
     
     function getExport()
     {
-        return is_bool($this->export) ? $this->getSelect() : $this->export;
+        return is_bool($this->export) ? $this->select : $this->export;
     }
     
     function hasExport(): bool

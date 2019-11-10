@@ -76,7 +76,7 @@ class Query {
             
             $counter++;
         }
-
+        
         if($total)    $total = $total->getQuery()->getSingleScalarResult();
         
         foreach($this->view->getOrders() as $key => $order){
@@ -93,8 +93,8 @@ class Query {
         return $this->view->getTotal() ? ['total' => $total, 'data' => $data] : $data;
     }
     
-    function raw($sql){
-        $em = $this->doctrine->getManager();
+    function raw($sql, $orm=null){
+        $em = $this->doctrine->getManager($orm ? $orm : null);
         $conn = $em->getConnection();
         $query = $conn->prepare($sql);
         $query->execute();
