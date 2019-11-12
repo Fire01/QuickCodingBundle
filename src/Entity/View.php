@@ -84,6 +84,13 @@ class View
         return $this;
     }
 
+    function addConditions(array $condition): self
+    {
+        $this->conditions[] = $condition;
+        
+        return $this;
+    }
+
     function getOrders(): ?array
     {
         return $this->transformToAlias($this->orders);
