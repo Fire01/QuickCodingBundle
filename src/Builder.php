@@ -129,14 +129,6 @@ class Builder extends AbstractController {
         $item = $id ? $repository->find($id) : new $entity();
         $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
         
-        $event = new BuilderFormEvent($item, $form);
-        
-        if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch('quick_coding.builder_form_before_submit', $event);
-        }
-        
-        $form->handleRequest($request);
-        
         $this->config->addActionbarFormClose();
         if($edit){
             $this->config->addActionbarFormSave();
@@ -152,6 +144,14 @@ class Builder extends AbstractController {
                 ]));
             }
         }
+        
+        $event = new BuilderFormEvent($item, $form);
+        
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch('quick_coding.builder_form_before_submit', $event);
+        }
+        
+        $form->handleRequest($request);
         
         if($form->isSubmitted() && $form->isValid()) {
 

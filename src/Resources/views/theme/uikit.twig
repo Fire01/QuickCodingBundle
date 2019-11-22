@@ -481,7 +481,7 @@
     {%- set attr = attr|merge({ multiple: false}) -%}
     {%- set attr = attr|merge({ class: ' multifile'}) -%}
     {%- set attr = attr|merge({ 'data-type': form.vars.file_type}) -%}
-    <div class="uk-margin" uk-margin>
+    <div class="uk-margin" uk-margin><div class="target-multifile uk-first-column">
     	{%- if not form.parent.vars.disabled -%}
         <div class="js-upload" uk-form-custom>
             {{- block('form_widget_simple') -}}
@@ -489,6 +489,7 @@
         </div>
         {%- endif -%}
         <div class="target-multifile">
+        	{% if (form.vars.data | length) == 0 %}-{% endif %}
         	{% for data in form.vars.data %}
         	    {% set remove = data.remove is iterable ? (data.remove.path is defined ? path(data.remove.path, {id: data.remove.id}) : data.remove.url) : data.remove %}
         	    {%- if form.vars.file_type == 'image' -%}

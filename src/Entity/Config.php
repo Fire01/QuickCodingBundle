@@ -170,7 +170,7 @@ class Config {
         return $this->actionbar;
     }
     
-    function addActionbar(Action $action){        
+    function addActionbar(Action $action, $first=false){        
         if($action->getId() == '{auto}'){
             $action->setId($action->getType() . '_' . substr(md5(uniqid(mt_rand(), true)), 0, 6));
         }
@@ -179,7 +179,11 @@ class Config {
             if($action->getId() == $item->getId()){throw new \Exception(sprintf('Action with id "%s" already exist!', $item->getId()));}
         }
        
-        $this->actionbar[] = $action;
+        if($first){
+            array_unshift($this->actionbar, $action);
+        }else{
+            $this->actionbar[] = $action;
+        }
         
         return $this;
     }
