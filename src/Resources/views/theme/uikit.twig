@@ -92,10 +92,6 @@
     	    <script>
         	    $('.selectize-ajax').each(function(idx, el){
             	    var data = JSON.parse(el.dataset.selectize);
-            	    var url = '{{ asset('') }}' + data.url;
-            	    var params = Object.assign({}, data.params);
-            	   
-            	    url = url.replace("//", "/");
             	    
         	    	$(this).selectize({
             	        valueField: data.valueField,
@@ -105,8 +101,14 @@
             	        create: false,
             	        load: function(query, callback) {
             	            if (!query.length) return callback();
-            	            params.q = query;
 
+            	            var url = '{{ asset('') }}' + data.url;
+                    	    var params = Object.assign({}, data.params);
+                    	   
+                    	    url = url.replace("//", "/");
+                    	    
+            	            params.q = query;
+            	            console.log(params);
             	            for(var i in params){
                         	    var param = params[i];
                         	    if(isNaN(param) && param.indexOf('val:') >= 0){
@@ -114,7 +116,7 @@
                         	    	params[i] = $("#" + id).val();
                         	    }
                         	}
-
+							
             	            $.ajax({
             	                url: url,
             	                type: data.method,
