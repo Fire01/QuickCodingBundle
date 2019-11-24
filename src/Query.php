@@ -100,4 +100,11 @@ class Query {
         $query->execute();
         return $query->fetchAll();
     }
+    
+    function execute($sql, $orm=null){
+        $em = $this->doctrine->getManager($orm ? $orm : null);
+        $conn = $em->getConnection();
+        $query = $conn->prepare($sql);
+        return $query->execute();
+    }
 }
