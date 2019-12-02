@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormInterface;
 class MultifileType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options) {
-        
+        $view->vars['max_size'] = $options['maxSize'];
         $view->vars['file_type'] = $options['fileType'];
     }
     
@@ -20,6 +20,7 @@ class MultifileType extends AbstractType
             'fileType' => null,
             'mapped' => false,
             'attr' => ['allow' => null],
+            'maxSize' => 0
         ]);
     }
     

@@ -178,6 +178,7 @@
     	    <script>
     	    $("input[type='file'].multifile").on('change', function(event){
         	    var type = event.currentTarget.dataset.type;
+        	    var maxSize = parseInt(event.currentTarget.dataset.maxSize);
         	    var allow = type == "image" ? ["image"] : ($(this).attr('allow') ? $(this).attr('allow').split(",") : []);
 				var target = $(this).parent().parent().find('.target-multifile');
 				var clone = $(this).clone();
@@ -186,6 +187,14 @@
 			    var file = this.files[0];
 			    var size = qc.bytesToSize(file.size);
 			    var ftype = file.type.split("/")[0];
+
+			    if(maxSize){
+			    	var nSize = Math.round(file.size / Math.pow(1024, 1));
+			    	if(nSize >= maxSize){
+			    		target.append('<div class="uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>Maximum size is ' + maxSize + ' KB!</p></div>');
+			    		return false;
+				    }
+			    }
 
 			    if(allow.length && allow.indexOf(ftype) < 0){
 					target.append('<div class="uk-alert-danger" uk-alert><a class="uk-alert-close" uk-close></a><p>Only "' + allow.join(",") + '" files are allowed</p></div>');
@@ -482,7 +491,7 @@
 	{%- set type = type|default('file') -%}
     {%- set attr = attr|merge({ multiple: false}) -%}
     {%- set attr = attr|merge({ class: ' multifile'}) -%}
-    {%- set attr = attr|merge({ 'data-type': form.vars.file_type}) -%}
+    {%- set attr = attr|merge({ 'data-type': form.vars.file_type, 'data-max-size': form.vars.max_size}) -%}
     <div class="uk-margin" uk-margin><div class="target-multifile uk-first-column">
     	{%- if not form.parent.vars.disabled -%}
         <div class="js-upload" uk-form-custom>
