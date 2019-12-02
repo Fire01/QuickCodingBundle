@@ -498,9 +498,11 @@
             {{- block('form_widget_simple') -}}
             <button class="uk-button uk-button-default" type="button" tabindex="-1">Add {{ form.vars.label ? form.vars.label : form.vars.name|humanize }}</button>
         </div>
+        {%- else -%}
+        <div class="js-upload" uk-form-custom>
+        </div>
         {%- endif -%}
         <div class="target-multifile">
-        	{% if (form.vars.data | length) == 0 %}-{% endif %}
         	{% for data in form.vars.data %}
         	    {% set remove = data.remove is iterable ? (data.remove.path is defined ? path(data.remove.path, {id: data.remove.id}) : data.remove.url) : data.remove %}
         	    {%- if form.vars.file_type == 'image' -%}
