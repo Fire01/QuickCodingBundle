@@ -200,7 +200,7 @@ class Config {
         $action->setType('submit');
         $action->setTarget($target);
         $action->setIcon('check');
-        $action->setClick("$('form" . ($action->getTarget() ? "[name=\"form_" . $action->getTarget() . "\"]" : "") . "').find('> button[type=submit]').click()");
+        $action->setClick("$('form" . ($action->getTarget() ? "[name=\"form_" . $action->getTarget() . "\"]" : "") . "').find('button[type=submit]').click()");
         
         $this->addActionbar($action);
         
