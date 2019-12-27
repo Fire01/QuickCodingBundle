@@ -41,6 +41,11 @@ class ImageuploadType extends AbstractType
                     
                     $event->setData($imagine);
                 }
+            }else{
+                $data = $event->getForm()->getData();
+                if($data){
+                    $event->setData($data);
+                }
             }
         });
         
