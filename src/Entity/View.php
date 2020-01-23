@@ -15,6 +15,7 @@ class View
     protected $export=false;
     protected $page = 1;
     protected $length = 25;
+    protected $action = 'button';
     protected $alias = "t";
     protected $join = [];
     
@@ -32,7 +33,8 @@ class View
         if(isset($config['search']))    $this->setSearch($config['search']);
         if(isset($config['q']))         $this->setQ($config['q']);
         if(isset($config['total']))     $this->setTotal($config['total']);
-        if(isset($config['export']))     $this->setExport($config['export']);
+        if(isset($config['export']))    $this->setExport($config['export']);
+        if(isset($config['action']))    $this->setAction($config['action']);
         if(isset($config['alias']))     $this->setAlias($config['alias']);
         
         $this->setJoin(isset($config['join']) ? $config['join'] : []);
@@ -105,8 +107,10 @@ class View
 
     function getSearch(): ?array
     {
+        
         $search = count($this->search) ? $this->search : array_keys($this->select);
-        if (($key = array_search("id", $search)) !== false) {
+        $isSetInView = count($this->getSelect()) && array_keys($this->getSelect())[count(array_keys($this->getSelect())) - 1] == 't.id';
+        if (($key = array_search("id", $search)) !== false && $isSetInView) {
             unset($search[$key]);
         }
         
@@ -181,6 +185,18 @@ class View
     function setLength(?int $length): self
     {
         $this->length = $length;
+        
+        return $this;
+    }
+    
+    function getAction(): ?string
+    {
+        return $this->action;
+    }
+    
+    function setAction(?string $action): self
+    {
+        $this->action = $action;
         
         return $this;
     }

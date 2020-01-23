@@ -38,8 +38,6 @@ $(document).ready(function(){
 		            var isT = data.substr(10,1) == "T";
 					if(isT){
 						return d.toLocaleString('en', { dateStyle : 'medium', timeStyle: 'short', timeZone: 'UTC' });
-						//return date.toLocaleDateString('en', { dateStyle : 'medium', timeZone: 'UTC' });
-		            	//return date.toLocaleTimeString('en', { timeStyle: 'short', timeZone: 'UTC' });
 					}
 	            }
 
@@ -57,20 +55,50 @@ $(document).ready(function(){
 		width:110, 
 		orderable:false, 
 		defaultContent: `
-        	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
-        		<span uk-icon="icon: file-text"></span>
-        	</button>
-        	{%- if (config.ACL.update|length) == 0 or is_granted(config.ACL.update) -%}
-        	<button type="button" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
-    			<span uk-icon="icon: file-edit"></span>
-    		</button>
-    		{%- endif -%}
-    		{%- if (config.ACL.delete|length) == 0 or is_granted(config.ACL.delete) -%}
-    		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
-    			<span uk-icon="icon: minus-circle"></span>
-    		</button>
-    		{%- endif -%}
-	`});
+			{% if config.view.action == 'button' %}
+            	<button type="button" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
+            		<span uk-icon="icon: file-text"></span>
+            	</button>
+            	{%- if (config.ACL.update|length) == 0 or is_granted(config.ACL.update) -%}
+            	<button type="button" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
+        			<span uk-icon="icon: file-edit"></span>
+        		</button>
+        		{%- endif -%}
+        		{%- if (config.ACL.delete|length) == 0 or is_granted(config.ACL.delete) -%}
+        		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
+        			<span uk-icon="icon: minus-circle"></span>
+        		</button>
+        		{%- endif -%}
+    		{% endif %}
+		`,
+		render: (data, type, row) => {
+        	{% if config.view.action == 'link' %}
+
+        	    {% set a = config.params ? config.params|merge({action: 'read', id: '0000'}) : {action: 'read', id: '0000'} %}
+        	    {% set b = config.params ? config.params|merge({action: 'update', id: '0000'}) : {action: 'update', id: '0000'} %}
+        	    
+				var la = ("{{ path(config.path.view, a) }}").replace("0000", row.id);
+				var lb = ("{{ path(config.path.form, b) }}").replace("0000", row.id);				
+				
+        		return `
+            		<a href="${la}" class="uk-button uk-button-secondary uk-border-rounded uk-button-small qc-btn-action qc-view">
+                		<span uk-icon="icon: file-text"></span>
+                	</a>
+                	{%- if (config.ACL.update|length) == 0 or is_granted(config.ACL.update) -%}
+                	<a href="${lb}" class="uk-button uk-button-primary uk-border-rounded uk-button-small qc-btn-action qc-edit">
+            			<span uk-icon="icon: file-edit"></span>
+            		</a>
+            		{%- endif -%}
+            		{%- if (config.ACL.delete|length) == 0 or is_granted(config.ACL.delete) -%}
+            		<button type="button" class="uk-button uk-button-danger uk-border-rounded uk-button-small qc-btn-action qc-delete">
+        				<span uk-icon="icon: minus-circle"></span>
+            		</button>
+            		{%- endif -%}
+        		`
+    	    {% endif %}
+		}
+	});
+
 	var delID = null;
 	var table = $("#qc-table-datatables").DataTable({
 		order: [orders.length ? orders : [0, 'Asc']],
@@ -98,26 +126,40 @@ $(document).ready(function(){
             $('.dataTables_filter').append($searchButton);
         }
     });
-	
-	$("#qc-table-datatables tbody").on( "click", "td .qc-view", function(e){
-		var row = table.row($(e.currentTarget).parents('tr')).data();
-		{% set params = config.params ? config.params|merge({action: 'read', id: '0000'}) : {action: 'read', id: '0000'} %}
-		var path = "{{ path(config.path.form, params) }}";
-		path = path.replace("0000", row.id);
-		document.location = path;
-	})
 
-	$("#qc-table-datatables tbody").on( "click", "td .qc-edit", function(e){
-		var row = table.row($(e.currentTarget).parents('tr')).data();
-		{% set params = config.params ? config.params|merge({action: 'update', id: '0000'}) : {action: 'update', id: '0000'} %}
-		var path = "{{ path(config.path.form, params) }}";
-		path = path.replace("0000", row.id);
-		document.location = path;
-	})
+	
+	{% if config.view.action == 'button' %}
+    	var items = $("#qc-table-datatables tbody tr td a.qc-btn-action");
+    	for(var i in items){
+        	var item = items[i];
+    	    if(item && item.href == "#"){
+    	        console.log(item)
+    	    }
+    	}
+    {% endif %}
+        
+	
+	{% if config.view.action == 'button' %}
+    	$("#qc-table-datatables tbody").on( "click", "td .qc-view", function(e){
+    		var row = table.row($(e.currentTarget).parents('tr')).data();
+    		{% set params = config.params ? config.params|merge({action: 'read', id: '0000'}) : {action: 'read', id: '0000'} %}
+    		var path = "{{ path(config.path.form, params) }}";
+    		path = path.replace("0000", row.id);
+    		document.location = path;
+    	})
+    
+    	$("#qc-table-datatables tbody").on( "click", "td .qc-edit", function(e){
+    		var row = table.row($(e.currentTarget).parents('tr')).data();
+    		{% set params = config.params ? config.params|merge({action: 'update', id: '0000'}) : {action: 'update', id: '0000'} %}
+    		var path = "{{ path(config.path.form, params) }}";
+    		path = path.replace("0000", row.id);
+    		document.location = path;
+    	})
+	{% endif %}
 
 	$("#qc-table-datatables tbody").on( "click", "td .qc-delete", function(e){
 		var row = table.row($(e.currentTarget).parents('tr')).data();
-		UIkit.modal.confirm('Are you sure want to delete data {{ config.title }}?').then(function() {
+		UIkit.modal.confirm('Are you sure want to delete these data?').then(function() {
 			{% set params = config.params ? config.params|merge({action: 'delete', id: '0000'}) : {action: 'delete', id: '0000'} %}
 			var path = "{{ path(config.path.remove, params) }}";
 			path = path.replace("0000", row.id);
