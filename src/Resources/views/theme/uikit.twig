@@ -265,7 +265,7 @@
         <div class="uk-form-controls">
             {{- form_widget(form, widget_attr) -}}
             {%- if help is not empty -%}
-            <span class="uk-text-small uk-text-muted uk-display-block qc-help">{{ help }}</span>
+            <span class="uk-text-small uk-text-muted uk-display-block qc-help">{{ help | raw }}</span>
             {%- endif -%}
             {{- form_errors(form) -}}
         </div>
