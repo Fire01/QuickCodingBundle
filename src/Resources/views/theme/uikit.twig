@@ -28,6 +28,10 @@
         	<script src="{{ asset(quick_coding.public ~ 'plugins/tinymce/tinymce.min.js') }}"></script>
     	{% endif %}
     	
+    	{% if 'list' in blocks %}
+    	    <script src="{{ asset(quick_coding.public ~ 'js/form/list.js') }}"></script>
+    	{% endif %}
+    	
     	{%- set attr = attr|merge({ 'class': (attr.class|default('') ~ ' uk-form-horizontal')|trim }) -%}
         {%- do form.setMethodRendered() -%}
         {% set method = method|upper %}
@@ -108,7 +112,6 @@
                     	    url = url.replace("//", "/");
                     	    
             	            params.q = query;
-            	            console.log(params);
             	            for(var i in params){
                         	    var param = params[i];
                         	    if(isNaN(param) && param.indexOf('val:') >= 0){
@@ -148,6 +151,10 @@
     		    }
     	    })
     	    </script>
+    	{% endif %}
+    	
+    	{% if 'list' in blocks %}
+    	    <script>$('.list-type-component').each((i, e) => qcList.render($(e)))</script>
     	{% endif %}
     	
     	{% if 'imageupload' in blocks %}
@@ -525,6 +532,24 @@
         	{% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{# =========================================================== List Widget ===========================================================#}
+{% block list_widget -%}
+	{%- if not form.parent.vars.disabled -%}
+        <div class="container-list-type">
+        	<input type="text" class="uk-input"/>
+        	<button type="button" onclick="qcList.add($(this))" class="uk-button uk-button-primary button-add-list"><span uk-icon="plus-circle"></span> Add</button>
+        </div>
+        <select {{ block('widget_attributes') }} multiple="multiple">
+        	{%- for v in value -%}<option selected>{{ v }}</option>{%- endfor -%}
+        </select>
+        <ul class="list-type-display"></ul>
+    {%- else -%}
+    	<ul class="list-type-display">
+    		{%- for v in value -%}<li>{{ v }}</li>{%- endfor -%}
+    	</ul>
+    {%- endif -%}
 {% endblock %}
 
 {# =========================================================== Google Autocomplete Widget ===========================================================#}
