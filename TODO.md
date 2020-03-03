@@ -4,3 +4,5 @@ TODO
 - Query Builder View Order by Relation Column
 - Test Remove relation from entity not from event
 - Add Export Data to Excel
+- Recursive Relation
+- Default builder no buttons

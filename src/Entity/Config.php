@@ -7,6 +7,7 @@ class Config {
     protected $title;
     protected $entity;
     protected $form;
+    protected $formOptions;
     protected $viewType;
     protected $view = null;
     protected $path = ['view' => null, 'form' => null, 'remove' => null];
@@ -24,6 +25,7 @@ class Config {
         $this->setTitle(isset($config['title']) && $config['title'] ? $config['title'] : null);
         $this->setEntity(isset($config['entity']) && $config['entity'] ? $config['entity'] : null);
         $this->setForm(isset($config['form']) && $config['form'] ? $config['form'] : null);
+        $this->setFormOptions(isset($config['formOptions']) && count($config['formOptions']) ? $config['formOptions'] : []);
         $this->setViewType(isset($config['viewType']) && $config['viewType'] ? $config['viewType'] : null);
         $this->setTemplate(isset($config['template']) && $config['template'] ? $config['template'] : null);
         
@@ -80,6 +82,16 @@ class Config {
     
     function setForm($form=null){
         $this->form = $form;
+        
+        return $this;
+    }
+
+    function getFormOptions(){
+        return $this->formOptions;
+    }
+    
+    function setFormOptions($options=[]){
+        $this->formOptions = $options;
         
         return $this;
     }

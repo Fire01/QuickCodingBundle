@@ -2,9 +2,9 @@
 
 namespace Fire01\QuickCodingBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class BuilderRemoveEvent extends Event
+class BuilderRemoveEvent extends EventDispatcher
 {
     private $entity;
     private $em;

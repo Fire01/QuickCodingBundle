@@ -2,9 +2,9 @@
 
 namespace Fire01\QuickCodingBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class BuilderViewEvent extends Event
+class BuilderViewEvent extends EventDispatcher
 {
     private $data;
     private $total;

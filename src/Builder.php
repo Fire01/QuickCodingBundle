@@ -127,7 +127,8 @@ class Builder extends AbstractController {
         $entity = $this->config->getEntity();
         
         $item = $id ? $repository->find($id) : new $entity();
-        $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
+        $options = array_merge($this->config->getFormOptions(), ['disabled' => !$edit]);
+        $form = $this->createForm($this->config->getForm(), $item, $options);
         
         $this->config->addActionbarFormClose();
         if($edit){
@@ -148,7 +149,7 @@ class Builder extends AbstractController {
         $event = new BuilderFormEvent($item, $form);
         
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch('quick_coding.builder_form_before_submit', $event);
+            $this->eventDispatcher->dispatch($event, 'quick_coding.builder_form_before_submit');
         }
         
         $form->handleRequest($request);
@@ -158,7 +159,7 @@ class Builder extends AbstractController {
             $event = new BuilderFormEvent($item, $form);
             
             if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch('quick_coding.builder_form_before_save', $event);
+                $this->eventDispatcher->dispatch($event, 'quick_coding.builder_form_before_save');
             }
 
             $em = $this->getDoctrine()->getManager();
@@ -182,7 +183,7 @@ class Builder extends AbstractController {
         $event = new BuilderRemoveEvent($item, $em);
         
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch('quick_coding.builder_remove_after', $event);
+            $this->eventDispatcher->dispatch($event, 'quick_coding.builder_remove_after');
         }
         
         $em->flush();
