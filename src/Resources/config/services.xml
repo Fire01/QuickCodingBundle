@@ -6,6 +6,14 @@
     	<!-- Builder Service -->
         <service id="Fire01\QuickCodingBundle\Builder" autowire="true" autoconfigure="true"></service>
 		<!-- End Builder Service -->
+
+        <!-- Builder New Service -->
+        <service id="Fire01\QuickCodingBundle\Builder\Builder" autowire="true" autoconfigure="true"></service>
+		<!-- End Builder Service -->
+
+        <!-- Builder New Service -->
+        <service id="Fire01\QuickCodingBundle\Builder\Form" autowire="true" autoconfigure="true"></service>
+		<!-- End Builder Service -->
 		
 		<!-- Rest Query -->
         <service id="Fire01\QuickCodingBundle\Query" autowire="true" autoconfigure="true">

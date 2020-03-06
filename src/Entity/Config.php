@@ -44,7 +44,6 @@ class Config {
             'title'     => $this->getTitle(),
             'entity'    => $this->getEntity(),
             'form'      => $this->getForm(),
-            'column'    => $this->getColumn(),
             'viewType'  => $this->getViewType(),
             'template'  => $this->getTemplate(),
             'path'      => $this->getPath(),
