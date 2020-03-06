@@ -181,6 +181,20 @@ class Config {
     function getActionbar(): array{
         return $this->actionbar;
     }
+
+    function getActionbarById($id): Action{
+        $key = array_search($id, array_column($this->actionbar, 'id'));
+        return $key !== false ? $this->actionbar[$key] : null;
+    }
+
+    function getActionbarByType($type): array{
+        return array_filter(
+            $this->actionbar,
+            function ($el) use (&$type) {
+                return $el->getType() == $type;
+            }
+        );
+    }
     
     function addActionbar(Action $action, $first=false){        
         if($action->getId() == '{auto}'){

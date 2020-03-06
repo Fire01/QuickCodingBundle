@@ -8,6 +8,7 @@ use Fire01\QuickCodingBundle\Entity\Action;
 use Fire01\QuickCodingBundle\Services\Validator;
 use Fire01\QuickCodingBundle\Event\BuilderFormEvent;
 use Fire01\QuickCodingBundle\Event\BuilderRemoveEvent;
+use Fire01\QuickCodingBundle\Event\QuickCodingEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -149,7 +150,7 @@ class Builder extends AbstractController {
         $event = new BuilderFormEvent($item, $form);
         
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch($event, 'quick_coding.builder_form_before_submit');
+            $this->eventDispatcher->dispatch($event, QuickCodingEvents::BUILDER_FORM_BEFORE_SUBMIT);
         }
         
         $form->handleRequest($request);
@@ -159,7 +160,7 @@ class Builder extends AbstractController {
             $event = new BuilderFormEvent($item, $form);
             
             if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch($event, 'quick_coding.builder_form_before_save');
+                $this->eventDispatcher->dispatch($event, QuickCodingEvents::BUILDER_FORM_BEFORE_SAVE);
             }
 
             $em = $this->getDoctrine()->getManager();
@@ -183,7 +184,7 @@ class Builder extends AbstractController {
         $event = new BuilderRemoveEvent($item, $em);
         
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch($event, 'quick_coding.builder_remove_after');
+            $this->eventDispatcher->dispatch($event, QuickCodingEvents::BUILDER_REMOVE_AFTER);
         }
         
         $em->flush();
