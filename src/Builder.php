@@ -128,6 +128,9 @@ class Builder extends AbstractController {
         
         $item = $id ? $repository->find($id) : new $entity();
         $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
+        $options = array_merge($this->config->getFormOptions(), ['disabled' => !$edit]);
+        $form = $this->createForm($this->config->getForm(), $item, $options);
+
         
         $this->config->addActionbarFormClose();
         if($edit){
