@@ -30,6 +30,26 @@
         	   
             <div class="uk-section-small">
                 <div class="uk-container uk-container-large">
+                
+                    {% for info in app.flashes('info') %}       
+                        <div class="uk-alert-primary" uk-alert>
+                            <a class="uk-alert-close" uk-close></a>
+                            <p>{{ info }}  </p>
+                        </div>               
+                    {% endfor %}
+                    {% for success in app.flashes('success') %}       
+                        <div class="uk-alert-success" uk-alert>
+                            <a class="uk-alert-close" uk-close></a>
+                            <p>{{ success }}  </p>
+                        </div>               
+                    {% endfor %}
+                    {% for error in app.flashes('error') %}       
+                        <div class="uk-alert-danger" uk-alert>
+                            <a class="uk-alert-close" uk-close></a>
+                            <p>{{ error }}  </p>
+                        </div>               
+                    {% endfor %}
+
                     {% block body %}{% endblock %}
                 </div>
             </div>

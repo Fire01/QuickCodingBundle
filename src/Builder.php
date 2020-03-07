@@ -8,9 +8,11 @@ use Fire01\QuickCodingBundle\Entity\Action;
 use Fire01\QuickCodingBundle\Services\Validator;
 use Fire01\QuickCodingBundle\Event\BuilderFormEvent;
 use Fire01\QuickCodingBundle\Event\BuilderRemoveEvent;
+use Fire01\QuickCodingBundle\Event\QuickCodingEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Builder extends AbstractController {
      
@@ -39,7 +41,7 @@ class Builder extends AbstractController {
         
         $request = $this->get('request_stack')->getCurrentRequest();
         $this->config->setPath($request->attributes->get('_route'));
-        $action = strtolower($request->attributes->get('_route_params')['action']);
+        $action = $this->getConfig()->getAction();
         $id = $request->attributes->get('id');
         
         switch($action){
@@ -127,10 +129,10 @@ class Builder extends AbstractController {
         $entity = $this->config->getEntity();
         
         $item = $id ? $repository->find($id) : new $entity();
-        $form = $this->createForm($this->config->getForm(), $item, ['disabled' => !$edit]);
+        if(!$item)  throw new NotFoundHttpException("Not Found!");
+
         $options = array_merge($this->config->getFormOptions(), ['disabled' => !$edit]);
         $form = $this->createForm($this->config->getForm(), $item, $options);
-
         
         $this->config->addActionbarFormClose();
         if($edit){
@@ -151,7 +153,7 @@ class Builder extends AbstractController {
         $event = new BuilderFormEvent($item, $form);
         
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch('quick_coding.builder_form_before_submit', $event);
+            $this->eventDispatcher->dispatch(QuickCodingEvents::BUILDER_FORM_BEFORE_SUBMIT, $event);
         }
         
         $form->handleRequest($request);
@@ -161,7 +163,7 @@ class Builder extends AbstractController {
             $event = new BuilderFormEvent($item, $form);
             
             if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch('quick_coding.builder_form_before_save', $event);
+                $this->eventDispatcher->dispatch(QuickCodingEvents::BUILDER_FORM_BEFORE_SAVE, $event,);
             }
 
             $em = $this->getDoctrine()->getManager();
@@ -185,7 +187,7 @@ class Builder extends AbstractController {
         $event = new BuilderRemoveEvent($item, $em);
         
         if ($this->eventDispatcher) {
-            $this->eventDispatcher->dispatch('quick_coding.builder_remove_after', $event);
+            $this->eventDispatcher->dispatch(QuickCodingEvents::BUILDER_REMOVE_AFTER, $event);
         }
         
         $em->flush();
