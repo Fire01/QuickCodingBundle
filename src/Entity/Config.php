@@ -182,18 +182,41 @@ class Config {
         return $this->actionbar;
     }
 
-    function getActionbarById($id): Action{
-        $key = array_search($id, array_column($this->actionbar, 'id'));
-        return $key !== false ? $this->actionbar[$key] : null;
+    function getActionbarById($id, bool $returnKey=false){
+        foreach($this->actionbar as $key => $action) {
+            if ($id == $action->getId()) {
+                return $returnKey ? $key : $action;
+            }
+        }
+
+        return null;
     }
 
     function getActionbarByType($type): array{
-        return array_filter(
-            $this->actionbar,
-            function ($el) use (&$type) {
-                return $el->getType() == $type;
-            }
+        return array_values(
+            array_filter(
+                $this->actionbar,
+                function ($el) use (&$type) {
+                    return $el->getType() == $type;
+                }
+            )
         );
+    }
+
+    function getActionbarByText($text): array{
+        return array_values(
+            array_filter(
+                $this->actionbar,
+                function ($el) use (&$text) {
+                    return $el->getText() == $text;
+                }
+            )
+        );
+    }
+
+    function removeActionbar(Action $action){
+        $idx = $this->getActionbarById($action->getId(), true);
+        unset($this->actionbar[$idx]);
     }
     
     function addActionbar(Action $action, $first=false){        

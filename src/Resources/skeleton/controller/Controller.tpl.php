@@ -17,7 +17,7 @@ class <?= $class_name; ?> extends <?= $parent_class_name; ?><?= "\n" ?>
             'entity'=> '<?= $entity_name ?>',
             'form'	=> '<?= $form_name ?>',
             'view'=> [
-                'select' => [<?php foreach($columns as $column){ ?>	'<?= $column['title'] ?>' => '<?= $column['name'] ?>',	<?php } ?>],
+                'select' => [<?= implode(", ", $columns) ?>],
             ],
             'action' => $action
         ])->build();

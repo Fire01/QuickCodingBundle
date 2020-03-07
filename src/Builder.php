@@ -12,6 +12,7 @@ use Fire01\QuickCodingBundle\Event\QuickCodingEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Builder extends AbstractController {
      
@@ -40,7 +41,7 @@ class Builder extends AbstractController {
         
         $request = $this->get('request_stack')->getCurrentRequest();
         $this->config->setPath($request->attributes->get('_route'));
-        $action = strtolower($request->attributes->get('_route_params')['action']);
+        $action = $this->getConfig()->getAction();
         $id = $request->attributes->get('id');
         
         switch($action){
@@ -128,6 +129,8 @@ class Builder extends AbstractController {
         $entity = $this->config->getEntity();
         
         $item = $id ? $repository->find($id) : new $entity();
+        if(!$item)  throw new NotFoundHttpException("Not Found!");
+
         $options = array_merge($this->config->getFormOptions(), ['disabled' => !$edit]);
         $form = $this->createForm($this->config->getForm(), $item, $options);
         

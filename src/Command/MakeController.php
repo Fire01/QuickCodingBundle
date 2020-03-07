@@ -65,12 +65,17 @@ final class MakeController extends AbstractMaker
             $argument2 = $command->getDefinition()->getArgument('form-class');
             
             $question2 = new Question($argument2->getDescription());
-            $question2->setValidator(function ($answer){
-                $answer = class_exists('App\Form\\' . $answer) ? 'App\Form\\' . $answer : $answer;
-                if (!class_exists($answer)) {throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist.', $answer));}
-                if (!is_subclass_of($answer, 'Symfony\Component\Form\FormTypeInterface')) {throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface".', $answer));}
+            $question2->setValidator(function ($form){
+                $class = class_exists('App\Form\\' . $form) ? 'App\Form\\' . $form : $form;
+                if(!class_exists($class)){
+                    $withSuffix = class_exists('App\Form\\' . $form . 'Type') ? 'App\Form\\' . $form . 'Type' : $form . 'Type';
+                    $class = class_exists($withSuffix) ? $withSuffix : $class;
+                }
+
+                if (!class_exists($class)) {throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not exist.', $class));}
+                if (!is_subclass_of($class, 'Symfony\Component\Form\FormTypeInterface')) {throw new InvalidArgumentException(sprintf('Could not load type "%s": class does not implement "Symfony\Component\Form\FormTypeInterface".', $answer));}
                 
-                return $answer;
+                return $class;
             });
             
             $question2->setMaxAttempts(3);
@@ -92,7 +97,7 @@ final class MakeController extends AbstractMaker
         $columns = [];
         
         for($i=1;$i<3;$i++){
-            if(isset($fieldNames[$i])) $columns[] = ['title' => $fieldNames[$i], 'name' => $fieldNames[$i]];
+            if(isset($fieldNames[$i])) $columns[] = "'{$fieldNames[$i]}' => '$fieldNames[$i]'";
         }
         
         $formClass = $input->getArgument('form-class');
