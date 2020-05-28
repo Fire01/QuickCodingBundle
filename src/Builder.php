@@ -38,7 +38,6 @@ class Builder extends AbstractController {
 
     function build(){
         Validator::build($this->config);
-        
         $request = $this->get('request_stack')->getCurrentRequest();
         $this->config->setPath($request->attributes->get('_route'));
         $action = $this->getConfig()->getAction();

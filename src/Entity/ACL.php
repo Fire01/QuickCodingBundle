@@ -79,7 +79,7 @@ class ACL {
     
     function canRead($roles) : bool{
         if(count($this->getRead())){
-            return count(array_intersect($this->getCreate(), $roles)) > 0 ? true : false;
+            return count(array_intersect($this->getRead(), $roles)) > 0 ? true : false;
         }
         
         return true;
@@ -97,7 +97,7 @@ class ACL {
     
     function canUpdate($roles) : bool{
         if(count($this->getUpdate())){
-            return count(array_intersect($this->getCreate(), $roles)) > 0 ? true : false;
+            return count(array_intersect($this->getUpdate(), $roles)) > 0 ? true : false;
         }
         
         return true;
@@ -115,7 +115,7 @@ class ACL {
     
     function canDelete($roles) : bool{
         if(count($this->getDelete())){
-            return count(array_intersect($this->getCreate(), $roles)) > 0 ? true : false;
+            return count(array_intersect($this->getDelete(), $roles)) > 0 ? true : false;
         }
         
         return true;
