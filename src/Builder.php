@@ -162,7 +162,7 @@ class Builder extends AbstractController {
             $event = new BuilderFormEvent($item, $form);
             
             if ($this->eventDispatcher) {
-                $this->eventDispatcher->dispatch(QuickCodingEvents::BUILDER_FORM_BEFORE_SAVE, $event,);
+                $this->eventDispatcher->dispatch(QuickCodingEvents::BUILDER_FORM_BEFORE_SAVE, $event);
             }
 
             $em = $this->getDoctrine()->getManager();
