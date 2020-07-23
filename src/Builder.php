@@ -169,6 +169,10 @@ class Builder extends AbstractController {
             $em->persist($item);
             $em->flush();
             
+            if ($this->eventDispatcher) {
+                $this->eventDispatcher->dispatch(QuickCodingEvents::BUILDER_FORM_AFTER_SAVE, $event);
+            }
+
             return $this->redirectToRoute($this->config->getPathView(), $this->getConfig()->getParams());
         }
         
